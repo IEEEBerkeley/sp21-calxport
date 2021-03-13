@@ -8,6 +8,11 @@
     "scripts": ["background.js"],
     "persistent": false
   },
+  "key": "AIzaSyDMYUAibKEqBlX4k2WtVdu-iktw7JAFy5A",
+  "oauth2": {
+    "client_id": "806985070719-8sillfgbsvbfn4a4nt7in4cjt2pqq4nq.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/calendar"]
+  },
   "page_action": {
     "default_popup": "popup.html",
     "default_icon": {
