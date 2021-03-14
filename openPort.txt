@@ -1,0 +1,2 @@
+Copy and paste this onto your terminal:
+python3 -m http.server

@@ -1,21 +1,47 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Google Calendar API Quickstart</title>
-    <meta charset="utf-8" />
-  </head>
-  <body>
-    <p>Google Calendar API Quickstart</p>
+  <style>
+    button {
+            height: 40px;
+            width: 60px;
+            outline: none;
+        }
 
-    <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button" style="display: none;">Authorize</button>
-    <button id="signout_button" style="display: none;">Sign Out</button>
+        h1 {
+            height: 90px;
+            width: 300px;
+            color: #604927;
+            text-align: center;
+        }
 
-    <pre id="content" style="white-space: pre-wrap;"></pre>
-    <!-- <script src="popup.js"></script>
-    <script async defer src="https://apis.google.com/js/api.js"
-      onload="this.onload=function(){};handleClientLoad()"
-      onreadystatechange="if (this.readyState === 'complete') this.onload()">
-    </script> -->
-  </body>
+        .greyButton{
+            background-color: #615e5b;
+            border: none;
+            color: white;
+            padding: 2px 30px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px auto;
+            cursor: pointer;
+            width: max-content;
+        }
+
+        .center-title {
+          text-align: center;
+          font-size: 16px;
+        }
+  </style>
+  <div class="center-title">
+    CalXPort
+  </div>
+  <div>
+    <button class="greyButton" id="getCourse">Grab Classes!</button>
+    <button class="greyButton" id="export">Export!</button>
+  </div>
+  <div>
+
+  </div>
+  <script src="popup.js"></script>
 </html>
