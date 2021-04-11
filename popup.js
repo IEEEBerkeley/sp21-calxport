@@ -12,11 +12,15 @@ getCourseButton.addEventListener("click", async () => {
   })
 }); 
 function injectScripts() {
+  function reformatCourseName(courseName) {
+    var splitArray = courseName.split("   ");
+    return splitArray
+  }
   var n = 0;
   var courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
   while (courseHTMLElem != null) {
-    courseName = courseHTMLElem.childNodes[0].nodeValue;
-    console.log(courseName);
+    courseName = reformatCourseName(courseHTMLElem.childNodes[0].nodeValue);
+    console.log(courseName.join(" "));
     n += 1;
     courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
   }
