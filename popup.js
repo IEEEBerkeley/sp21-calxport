@@ -6,15 +6,21 @@ let exportButton = document.getElementById('export');
 // returning the current tab's info
 // 2) Get popup.js send message to contentScripts.js whenever the user clicks on "Grab classes!" (for now)
 getCourseButton.addEventListener("click", function () {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+  // chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+  //   console.log(tabs);
+  //   console.log(chrome.runtime);
+  //   if (!tabs[0].url.includes("https://bcsweb.is.berkeley.edu/")) {
+  //     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
+  //     return;
+  //   }
+  //   chrome.tabs.sendMessage(tabs[0].id, {msg: "grab"}, function(response) {
+  //     console.log(response.receivedStatus);
+  //   });
+  // });
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     console.log(tabs);
-    console.log(chrome.runtime);
-    if (!tabs[0].url.includes("https://bcsweb.is.berkeley.edu/")) {
-      alert("Invalid site. Please go to CalCentral's Enrollment Center.");
-      return;
-    }
-    chrome.tabs.sendMessage(tabs[0].id, {msg: "grab"}, function(response) {
-      console.log(response.receivedStatus);
+    chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
+      console.log(response.farewell);
     });
   });
 }); 

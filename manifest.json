@@ -2,7 +2,7 @@
   "name": "CalXPort",
   "version": "0.1",
   "description": "Export class schedule from CalCentral's Enrollment Center to Google Calendar",
-  "permissions": ["activeTab", "declarativeContent", "tabs", "storage", "https://bcsweb.is.berkeley.edu/*"],
+  "permissions": ["activeTab", "declarativeContent", "tabs", "storage", "*://bcsweb.is.berkeley.edu/*"],
   "options_page": "options.html",
   "background": {
     "scripts": ["background.js"],
@@ -17,7 +17,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://bcsweb.is.berkeley.edu/*"],
+      "matches": ["<all_urls>"],
       "js": ["contentScripts.js"]
     }
   ],
