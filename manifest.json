@@ -17,8 +17,8 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["contentScripts.js"]
+      "matches": ["*://bcsweb.is.berkeley.edu/*"],
+      "js": ["content.js", "popup.js"]
     }
   ],
   "icons": {
