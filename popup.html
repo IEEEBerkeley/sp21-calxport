@@ -33,15 +33,21 @@
           font-size: 16px;
         }
   </style>
-  <div class="center-title">
-    CalXPort
-  </div>
-  <div>
-    <button class="greyButton" id="getCourse">Grab Classes!</button>
-    <button class="greyButton" id="export">Export!</button>
-  </div>
-  <div>
-
-  </div>
+  <body>
+    <div class="center-title">
+      CalXPort
+    </div>
+    <div>
+      <button class="greyButton" id="getCourse">Grab Classes!</button>
+      <button class="greyButton" id="export">Export!</button>
+    </div>
+    <div>
+      <!--Add buttons to initiate auth sequence and sign out-->
+      <button id="authorize_button" style="display: none;">Authorize</button>
+      <button id="signout_button" style="display: none;">Sign Out</button>
+  
+      <pre id="content" style="white-space: pre-wrap;"></pre>
+    </div>
+  </body>
   <script src="popup.js"></script>
 </html>

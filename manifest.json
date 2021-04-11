@@ -2,30 +2,29 @@
   "name": "CalXPort",
   "version": "0.1",
   "description": "Export class schedule from CalCentral's Enrollment Center to Google Calendar",
-  "permissions": ["activeTab", "declarativeContent", "tabs", "storage", "*://bcsweb.is.berkeley.edu/*"],
+  "permissions": ["activeTab", "declarativeContent", "tabs", "storage", "scripting"],
   "options_page": "options.html",
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js"
   },
   "oauth2": {
     "client_id": "806985070719-8sillfgbsvbfn4a4nt7in4cjt2pqq4nq.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/calendar"]
   },
-  "browser_action": {
-    "default_popup": "popup.html"
-  },
-  "content_scripts": [
-    {
-      "matches": ["*://bcsweb.is.berkeley.edu/*"],
-      "js": ["content.js", "popup.js"]
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "/images/get_started16.png",
+      "32": "/images/get_started32.png",
+      "48": "/images/get_started48.png",
+      "128": "/images/get_started128.png"
     }
-  ],
+  },
   "icons": {
     "16": "images/get_started16.png",
     "32": "images/get_started32.png",
     "48": "images/get_started48.png",
     "128": "images/get_started128.png"
   },
-  "manifest_version": 2
+  "manifest_version": 3
 }
