@@ -1,3 +1,7 @@
-console.log("contentScripts.js running...")
-var firstCourseName = document.getElementsByClassName("ps_grid-cell$0");
-  console.log(firstCourseName)
+console.log("on Enrollment Center page");
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.msg == "grab") {
+    console.log("contentScripts.js running...")
+    sendResponse({receivedStatus: "received"});
+  }
+})
