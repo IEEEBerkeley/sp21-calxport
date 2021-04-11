@@ -1,10 +1,5 @@
 let getCourseButton = document.getElementById('getCourse');
 let exportButton = document.getElementById('export');
-// tasks: 
-// 1) find out how to get chrome.tabs element (query) to return current tab info (url, etc.) 
-//-> possible issue: chrome.tabs only runs in popup.html environment -> it's not a tab and thus not
-// returning the current tab's info
-// 2) Get popup.js send message to contentScripts.js whenever the user clicks on "Grab classes!" (for now)
 getCourseButton.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab.url.includes("bcsweb.is.berkeley.edu")) {
@@ -17,5 +12,12 @@ getCourseButton.addEventListener("click", async () => {
   })
 }); 
 function injectScripts() {
-  console.log("hi");
+  var n = 0;
+  var courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
+  while (courseHTMLElem != null) {
+    courseName = courseHTMLElem.childNodes[0].nodeValue;
+    console.log(courseName);
+    n += 1;
+    courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
+  }
 }
