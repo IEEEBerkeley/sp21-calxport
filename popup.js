@@ -11,6 +11,18 @@ getCourseButton.addEventListener("click", async () => {
     function: scrapingScripts,
   })
 }); 
+
+exportButton.addEventListener("click", async () => {
+  let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab.url.includes("bcsweb.is.berkeley.edu")) {
+    alert("Invalid site. Please go to CalCentral's Enrollment Center.");
+    return
+  }
+  chrome.scripting.executeScript({
+    target: { tabID: tab.id },
+    function: newAddEvent('math','2021-04-03T03:00:00-07:00','2021-04-03T05:00:00-07:00'),
+  })
+})
 function scrapingScripts() {
   /** Removes excessive spaces between words in course name */
   function reformatCourseName(courseName) {
