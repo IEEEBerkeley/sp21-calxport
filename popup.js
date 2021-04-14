@@ -8,18 +8,21 @@ getCourseButton.addEventListener("click", async () => {
   }
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
-    function: injectScripts,
+    function: scrapingScripts,
   })
 }); 
-function injectScripts() {
+function scrapingScripts() {
+  /** Removes excessive spaces between words in course name */
   function reformatCourseName(courseName) {
     var splitArray = courseName.split("   ");
     return splitArray
   }
   var n = 0;
+  /** Grabs course name HTML element*/
   var courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
   while (courseHTMLElem != null) {
     courseName = reformatCourseName(courseHTMLElem.childNodes[0].nodeValue);
+    /** Joins the split string in array into a string with proper spacing format */
     console.log(courseName.join(" "));
     n += 1;
     courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
