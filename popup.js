@@ -118,6 +118,36 @@ function newAddEvent(className, dateTimeStart, dateTimeEnd) {
   });
 }
 
+/** Scraping Part */
+
+function scrapingScripts() {
+  var courseList = [];
+  /** NOTE: need to replace these codes with function calls for the simplicity of codes (currently unable to do so) */
+  function getCourseName(courseList) {
+    /** Removes excessive spaces between words in course name */
+    function reformatCourseName(courseName) {
+      var splitArray = courseName.split("   ");
+      return splitArray
+    }
+    var n = 0;
+    /** Grabs course name HTML element*/
+    var courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
+    while (courseHTMLElem != null) {
+      courseName = reformatCourseName(courseHTMLElem.childNodes[0].nodeValue);
+      /** Stores course info in a dictionary */
+      courseList.push({"course": courseName.join(" "),
+                        "lecture": null,
+                        "lab": null,
+                        "discussion": null,
+                        "groupStdy": null });
+      n += 1;
+      courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
+    }
+  }
+  getCourseName(courseList);
+  console.log(courseList);
+}
+
 let getCourseButton = document.getElementById('getCourse');
 let exportButton = document.getElementById('export');
 getCourseButton.addEventListener("click", async () => {
@@ -144,20 +174,3 @@ exportButton.addEventListener("click", async () => {
   })
 })
 
-function scrapingScripts() {
-  /** Removes excessive spaces between words in course name */
-  function reformatCourseName(courseName) {
-    var splitArray = courseName.split("   ");
-    return splitArray
-  }
-  var n = 0;
-  /** Grabs course name HTML element*/
-  var courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
-  while (courseHTMLElem != null) {
-    courseName = reformatCourseName(courseHTMLElem.childNodes[0].nodeValue);
-    /** Joins the split string in array into a string with proper spacing format */
-    console.log(courseName.join(" "));
-    n += 1;
-    courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
-  }
-}
