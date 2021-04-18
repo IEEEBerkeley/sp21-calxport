@@ -182,11 +182,11 @@ function scrapingScripts() {
       var sectionInfo = {};
       var section =  getSectionName(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
       sectionInfo["startDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
-      sectionInfo["endDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1];
+      sectionInfo["endDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1].trim();
       sectionInfo["days"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
       sectionInfo["startTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][0];
       sectionInfo["endTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][1];
-      sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
+      sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).trim();
       courseInfo[`${section}`] = {sectionInfo}
     }
     return courseInfo;
