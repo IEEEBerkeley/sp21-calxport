@@ -122,10 +122,11 @@ function newAddEvent(className, dateTimeStart, dateTimeEnd) {
 
 function scrapingScripts() {
   var courseList = [];
+  var courseNameList = [];
   /** NOTE: need to replace these codes with function calls for the simplicity of codes (currently unable to do so) */
   function getCourseName(courseList) {
     /** Removes excessive spaces between words in course name */
-    function reformatCourseName(courseName) {
+    function reformatCourseName(courseName, courseIdx) {
       var splitArray = courseName.split("   ");
       return splitArray
     }
@@ -143,6 +144,15 @@ function scrapingScripts() {
       n += 1;
       courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
     }
+  }
+  function getClassName(courseList, classString) {
+    var splitArray = classString.split(" - ");
+    courseList
+    return splitArray[0];
+  }
+  function getElementStringInRow(parentNode, gridCellIdx) {
+    var element = document.getElementById(parentNode).getElementsByClassName("ps_grid-cell")[gridCellIdx].innerText;
+    return element;
   }
   getCourseName(courseList);
   console.log(courseList);
