@@ -129,8 +129,9 @@ function scrapingScripts() {
     return courseHTMLElem.innerText;
   }
 
-  function getSectionName(classString) {
-    var splitArray = classString.split(" - ");
+  function getSectionName(node) {
+    var sectionName = getElementStringInRow(node, 0)
+    var splitArray = sectionName.split(" - ");
     return splitArray[0];
   }
 
@@ -138,8 +139,9 @@ function scrapingScripts() {
    * Index 0: start date
    * Index 1: end date
    */
-  function getStartEndDates(datesString) {
-    var splitArray = datesString.split(" - ");
+  function getStartEndDates(node) {
+    var dates = getElementStringInRow(node, 1);
+    var splitArray = dates.split(" - ");
     return [splitArray[0], splitArray[1]];
   }
 
@@ -147,7 +149,8 @@ function scrapingScripts() {
    * Index 0: array of all the days of the class
    * Index 1: array of start time (index 0) and end time (index 1)
    */
-  function getDaysTimes(dtString) {
+  function getDaysTimes(node) {
+    var dtString = getElementStringInRow(node, 2);
     var dtArray = dtString.split("\n");
     var dayArray = dtArray[0].split(" ");
     var timeArray = dtArray[1].split(" ");
@@ -161,8 +164,8 @@ function scrapingScripts() {
     return [dayArray, timeArray]
   }
   
-  function getRoom(roomString) {
-    return roomString;
+  function getRoom(node) {
+    return getElementStringInRow(node, 3);
   }
 
   /** Get specific element in the course row (in course table) */
@@ -177,13 +180,13 @@ function scrapingScripts() {
     courseInfo["course"] = getCourseName(courseIdx);
     for (var row = 0; document.getElementById(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) != null; row += 1) {
       var sectionInfo = {};
-      var section =  getSectionName(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 0));
-      sectionInfo["startDate"] = getStartEndDates(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 1))[0];
-      sectionInfo["endDate"] = getStartEndDates(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 1))[1];
-      sectionInfo["days"] = getDaysTimes(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 2))[0];
-      sectionInfo["startTime"] = getDaysTimes(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 2))[1][0];
-      sectionInfo["endTime"] = getDaysTimes(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 2))[1][1];
-      sectionInfo["room"] = getRoom(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 3));
+      var section =  getSectionName(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
+      sectionInfo["startDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
+      sectionInfo["endDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1];
+      sectionInfo["days"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
+      sectionInfo["startTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][0];
+      sectionInfo["endTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][1];
+      sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
       courseInfo[`${section}`] = {sectionInfo}
     }
     return courseInfo;
