@@ -1,3 +1,4 @@
+/** API Part */
 var CLIENT_ID = '806985070719-8sillfgbsvbfn4a4nt7in4cjt2pqq4nq.apps.googleusercontent.com';
 var API_KEY = 'AIzaSyDMYUAibKEqBlX4k2WtVdu-iktw7JAFy5A';
 
@@ -152,12 +153,21 @@ function scrapingScripts() {
   function getDaysTimes(node) {
     var dtString = getElementStringInRow(node, 2);
     var dtArray = dtString.split("\n");
+    if (dtArray.length == 1) {
+      // Schedule: To be Announced
+      var temp = dtArray[0];
+      dtArray[0] = dtArray[0].substring(9, temp.length);
+      return [[null]];
+    }
     var dayArray = dtArray[0].split(" ");
     var timeArray = dtArray[1].split(" ");
     dayArray.shift();
     timeArray.shift();
+    if (dayArray.join(" ") == "To be Announced") {
+      dayArray = [null];
+    }
     if (timeArray.join(" ") == "To be Announced") {
-      timeArray = ["To be Announced"];
+      timeArray = [null];
     } else {
       timeArray = [timeArray[0], timeArray[2]]
     }
@@ -181,9 +191,17 @@ function scrapingScripts() {
     for (var row = 0; document.getElementById(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) != null; row += 1) {
       var sectionInfo = {};
       var section =  getSectionName(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
+      // check if the section does not have time or date announced yet
+      if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length == 1) {
+        continue;
+      } else if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0] == [null] 
+                || getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1] == [null]) {
+                  continue;
+                  }
       sectionInfo["startDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
       sectionInfo["endDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1].trim();
       sectionInfo["days"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
+      console.log(getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1]);
       sectionInfo["startTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][0];
       sectionInfo["endTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][1];
       sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).trim();
