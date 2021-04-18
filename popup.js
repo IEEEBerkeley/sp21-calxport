@@ -124,37 +124,30 @@ function scrapingScripts() {
   var courseList = [];
   var courseNameList = [];
   /** NOTE: need to replace these codes with function calls for the simplicity of codes (currently unable to do so) */
-  function getCourseName(courseList) {
-    /** Removes excessive spaces between words in course name */
-    function reformatCourseName(courseName, courseIdx) {
-      var splitArray = courseName.split("   ");
-      return splitArray
-    }
-    var n = 0;
+  function getCourseName(courseIdx) {
     /** Grabs course name HTML element*/
-    var courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
-    while (courseHTMLElem != null) {
-      courseName = reformatCourseName(courseHTMLElem.childNodes[0].nodeValue);
-      /** Stores course info in a dictionary */
-      courseList.push({"course": courseName.join(" "),
-                        "lecture": null,
-                        "lab": null,
-                        "discussion": null,
-                        "groupStdy": null });
-      n += 1;
-      courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${n}`);
-    }
+    var courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${courseIdx}`);
+    return courseHTMLElem.innerText;
   }
-  function getClassName(courseList, classString) {
+  function getClassName(classString) {
     var splitArray = classString.split(" - ");
-    courseList
     return splitArray[0];
+  }
+  /** Returns an array of start and end dates 
+   * Index 0: start date
+   * Index 1: end date
+   */
+  function getStartEndDates(datesString) {
+    var startEndDates = [];
+    var splitArray = datesString.split(" - ");
+    startEndDates.push(splitArray[0]);
+    startEndDates.push(splitArray[1]);
+    return startEndDates;
   }
   function getElementStringInRow(parentNode, gridCellIdx) {
     var element = document.getElementById(parentNode).getElementsByClassName("ps_grid-cell")[gridCellIdx].innerText;
     return element;
   }
-  getCourseName(courseList);
   console.log(courseList);
 }
 
