@@ -122,33 +122,73 @@ function newAddEvent(className, dateTimeStart, dateTimeEnd) {
 
 function scrapingScripts() {
   var courseList = [];
-  var courseNameList = [];
   /** NOTE: need to replace these codes with function calls for the simplicity of codes (currently unable to do so) */
   function getCourseName(courseIdx) {
     /** Grabs course name HTML element*/
     var courseHTMLElem = document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${courseIdx}`);
     return courseHTMLElem.innerText;
   }
-  function getClassName(classString) {
+
+  function getSectionName(classString) {
     var splitArray = classString.split(" - ");
     return splitArray[0];
   }
+
   /** Returns an array of start and end dates 
    * Index 0: start date
    * Index 1: end date
    */
   function getStartEndDates(datesString) {
-    var startEndDates = [];
     var splitArray = datesString.split(" - ");
-    startEndDates.push(splitArray[0]);
-    startEndDates.push(splitArray[1]);
-    return startEndDates;
+    return [splitArray[0], splitArray[1]];
   }
+
+  /** Returns an array of days and times of a class
+   * Index 0: array of all the days of the class
+   * Index 1: array of start time (index 0) and end time (index 1)
+   */
+  function getDaysTimes(dtString) {
+    var dtArray = dtString.split("\n");
+    var dayArray = dtArray[0].split(" ");
+    var timeArray = dtArray[1].split(" ");
+    dayArray.shift();
+    timeArray.shift();
+    if (timeArray.join(" ") == "To be Announced") {
+      timeArray = ["To be Announced"];
+    } else {
+      timeArray = [timeArray[0], timeArray[2]]
+    }
+    return [dayArray, timeArray]
+  }
+  
+  function getRoom(roomString) {
+    return roomString;
+  }
+
+  /** Get specific element in the course row (in course table) */
   function getElementStringInRow(parentNode, gridCellIdx) {
     var element = document.getElementById(parentNode).getElementsByClassName("ps_grid-cell")[gridCellIdx].innerText;
     return element;
   }
-  console.log(courseList);
+
+  /** Get course name and all related sections and their info */
+  function getCourseInfo(courseIdx) {
+    var courseInfo = {};
+    courseInfo["course"] = getCourseName(courseIdx);
+    for (var row = 0; document.getElementById(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) != null; row += 1) {
+      var sectionInfo = {};
+      var section =  getSectionName(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 0));
+      sectionInfo["startDate"] = getStartEndDates(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 1))[0];
+      sectionInfo["endDate"] = getStartEndDates(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 1))[1];
+      sectionInfo["days"] = getDaysTimes(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 2))[0];
+      sectionInfo["startTime"] = getDaysTimes(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 2))[1][0];
+      sectionInfo["endTime"] = getDaysTimes(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 2))[1][1];
+      sectionInfo["room"] = getRoom(getElementStringInRow(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`, 3));
+      courseInfo[`${section}`] = {sectionInfo}
+    }
+    return courseInfo;
+  }
+  console.log(getCourseInfo(1));
 }
 
 let getCourseButton = document.getElementById('getCourse');
