@@ -196,8 +196,10 @@ function scrapingScripts() {
     if (document.getElementById(`DERIVED_SSR_FL_SSR_DRV_STAT$392$$${i}`).innerText == "Dropped") {
       continue;
     }
-    console.log(getCourseInfo(i));
+    courseList.push(getCourseInfo(i));
   }
+  console.log(courseList);
+  return courseList;
 }
 
 let getCourseButton = document.getElementById('getCourse');
