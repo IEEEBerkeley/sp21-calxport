@@ -191,7 +191,13 @@ function scrapingScripts() {
     }
     return courseInfo;
   }
-  console.log(getCourseInfo(1));
+  for (var i = 0; document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${i}`) != null; i += 1) {
+    /** Ignores dropped classes */
+    if (document.getElementById(`DERIVED_SSR_FL_SSR_DRV_STAT$392$$${i}`).innerText == "Dropped") {
+      continue;
+    }
+    console.log(getCourseInfo(i));
+  }
 }
 
 let getCourseButton = document.getElementById('getCourse');
