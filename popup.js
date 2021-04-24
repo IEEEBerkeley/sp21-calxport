@@ -231,6 +231,7 @@ try {
   
   let getCourseButton = document.getElementById('getCourse');
   let exportButton = document.getElementById('export');
+  let courseTable = document.getElementById('courseTable');
   getCourseButton.addEventListener("click", async () => {
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab.url.includes("bcsweb.is.berkeley.edu")) {
@@ -238,6 +239,7 @@ try {
       return
     }
     exportButton.style.display = 'block';
+    courseTable.style.display = 'block';
     chrome.scripting.executeScript({
       target: { tabId: tab.id },
       function: scrapingScripts,
