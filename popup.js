@@ -198,11 +198,11 @@ try {
         sectionInfo["course"] = getCourseName(courseIdx);
         sectionInfo["section"] = section;
         sectionInfo["startDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
-        sectionInfo["endDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1];
+        sectionInfo["endDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1].trim();
         sectionInfo["days"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
         sectionInfo["startTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][0];
         sectionInfo["endTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][1];
-        sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
+        sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).trim();
         courseInfo[`${section}`] = sectionInfo
       }
       return courseInfo;
@@ -214,17 +214,29 @@ try {
       }
       courseList.push(getCourseInfo(i));
     }
-
-    console.log(courseList);
-    for (const [k, v] of Object.entries(courseList[0])) {
-      console.log(v);
-    }
-
-    function addCourseToTable(courseDict) {
-      var row = document.createElement("tr");
-      
-    }
     return courseList;
+  }
+  function addCourseToTable(courseDict, tableID) {
+    let table = document.getElementById('courseTable');
+    for (const [sect, inf] of Object.entries(courseDict)) {
+      var row = document.createElement("tr");
+      // for (const [k, v] of Object.entries(courseDict[sect]))
+      // {
+      //   var info = document.createElement("td");
+      //   var node = document.createTextNode(v);
+      //   info.appendChild(node);
+      //   row.appendChild(info);
+      //   console.log(info)
+      // }
+      // console.log(inf)
+      Object.keys(courseDict[sect]).forEach(function(k) {
+        var info = document.createElement("td");
+        var node = document.createTextNode(courseDict[sect][k]);
+        info.appendChild(node);
+        row.appendChild(info);
+      })
+    table.appendChild(row);
+    }
   }
   
   let getCourseButton = document.getElementById('getCourse');
@@ -237,11 +249,19 @@ try {
       return
     }
     exportButton.style.display = 'block';
-    courseTable.style.display = 'block';
+    
     chrome.scripting.executeScript({
       target: { tabId: tab.id },
       function: scrapingScripts,
+    },
+    // gets return results from scrapingScripts()
+    (injectionResults) => {
+      console.log(injectionResults[0].result);
+      for (var i = 0; i < injectionResults[0].result.length; i += 1) {
+        addCourseToTable(injectionResults[0].result[i], 'courseTable');
+      }
     })
+    courseTable.style.display = 'block';
   }); 
   
   exportButton.addEventListener("click", async () => {
