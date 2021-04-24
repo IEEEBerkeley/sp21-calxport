@@ -203,7 +203,7 @@ try {
         sectionInfo["startTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][0];
         sectionInfo["endTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][1];
         sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
-        courseInfo[`${section}`] = {sectionInfo}
+        courseInfo[`${section}`] = sectionInfo
       }
       return courseInfo;
     }
@@ -217,11 +217,12 @@ try {
 
     console.log(courseList);
     for (const [k, v] of Object.entries(courseList[0])) {
-      console.log(k, v);
+      console.log(v);
     }
 
-    function addRow(rowDict) {
-
+    function addCourseToTable(courseDict) {
+      var row = document.createElement("tr");
+      
     }
     return courseList;
   }
