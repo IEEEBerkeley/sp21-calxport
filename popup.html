@@ -38,8 +38,8 @@
       CalXPort
     </div>
     <div>
-      <button class="greyButton" id="getCourse">Grab Classes!</button>
-      <button class="greyButton" id="export">Export!</button>
+      <button class="greyButton" id="getCourse" style="display: block">Grab Classes!</button>
+      <button class="greyButton" id="export" style="display: none">Export!</button>
     </div>
     <div>
       <!--Add buttons to initiate auth sequence and sign out-->
@@ -48,6 +48,10 @@
   
       <pre id="content" style="white-space: pre-wrap;"></pre>
     </div>
+    <script src="popup.js"></script>
+  <!-- <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script> -->
   </body>
-  <script src="popup.js"></script>
 </html>
