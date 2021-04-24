@@ -157,12 +157,7 @@ try {
       //console.log("dtArray 1: " + dtArray[1]);
       //"Schedule: To Be Announced case"
       if (dtArray.length == 1) {
-        var temp = dtArray[0];
-        var splitString = dtArray[0].substring(10, temp.length);
-        //console.log("hi2");
-        //console.log(splitArray);
-        //return [[splitString]];
-        return [[null]];
+        return null;
       }
   
       var dayArray = dtArray[0].split(" ");
@@ -170,13 +165,12 @@ try {
       dayArray.shift();
       timeArray.shift();
       if (dayArray.join(" ") == "To be Announced") {
-        dayArray = [null];
+        return null;
       }
       if (timeArray.join(" ") == "To be Announced") {
-        timeArray = [null];
-      } else {
-        timeArray = [timeArray[0], timeArray[2]]
+        return null;
       }
+      timeArray = [timeArray[0], timeArray[2]]
       return [dayArray, timeArray]
     }
     
@@ -193,21 +187,24 @@ try {
     /** Get course name and all related sections and their info */
     function getCourseInfo(courseIdx) {
       var courseInfo = {};
-      courseInfo["course"] = getCourseName(courseIdx);
       for (var row = 0; document.getElementById(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) != null; row += 1) {
         var sectionInfo = {};
         var section =  getSectionName(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
         
         //ADD WARNING TO USER FOR IT
-        if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length < 2) {
-          console.log("went through case 1");
+        if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) == null) {
           continue;
-        } else if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0] == [null] 
-                  || getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1] == [null]) {
-                    console.log("went through or statement");
-                    continue;
         }
-  
+        // if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length < 2) {
+        //   console.log("went through case 1");
+        //   continue;
+        // } else if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) == null
+        //           || getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) == null) {
+        //             console.log("went through or statement");
+        //             continue;
+        // }
+        sectionInfo["course"] = getCourseName(courseIdx);
+        sectionInfo["section"] = section;
         sectionInfo["startDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
         sectionInfo["endDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1];
         sectionInfo["days"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
@@ -225,7 +222,15 @@ try {
       }
       courseList.push(getCourseInfo(i));
     }
+
     console.log(courseList);
+    for (const [k, v] of Object.entries(courseList[0])) {
+      console.log(k, v);
+    }
+
+    function addRow(rowDict) {
+
+    }
     return courseList;
   }
   
