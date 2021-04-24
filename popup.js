@@ -195,14 +195,6 @@ try {
         if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) == null) {
           continue;
         }
-        // if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length < 2) {
-        //   console.log("went through case 1");
-        //   continue;
-        // } else if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) == null
-        //           || getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) == null) {
-        //             console.log("went through or statement");
-        //             continue;
-        // }
         sectionInfo["course"] = getCourseName(courseIdx);
         sectionInfo["section"] = section;
         sectionInfo["startDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
