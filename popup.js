@@ -308,8 +308,60 @@ function post(messageType, data) {
   });
 }
 
-setTimeout(() => {
-  (async function(){
-    console.log(await post('ping', 12345));
-  })()
-  }, 5000)
+// setTimeout(() => {
+//   (async function(){
+//     console.log(await post('ping', 12345));
+//   })()
+//   }, 5000)
+
+// NOTE: requires body properties to args.
+function jsonPOST(url, authToken, body={}, query = '') {
+  // VERY CRITICAL
+  // url = URL
+  // authToken = token
+  // body = JSON object
+  // query = JSON object
+  /*
+  {
+  	'data': 1234
+  }
+  
+  converts into data=1234
+  */
+  if (query) {
+  	query = '?' + Object.entries(query).map(([key, value]) => key + '=' + value).join('&');
+  }
+	return fetch(url + query, {
+  	method: 'POST',
+    headers: {
+    	'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`
+    },
+    body: JSON.stringify(body)
+  }).then(res => res.json());
+}
+function jsonGET(url, authToken, body={}, query = '') {
+  // VERY CRITICAL
+  // url = URL
+  // authToken = token
+  // body = JSON object
+  // query = JSON object
+  /*
+  {
+  	'data': 1234
+  }
+  
+  converts into data=1234
+  */
+  if (query) {
+  	query = '?' + Object.entries(query).map(([key, value]) => key + '=' + value).join('&');
+  }
+	return fetch(url + query, {
+  	method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${authToken}`
+    },
+  }).then(res => res.json());
+}
+// get authToken
+chrome.identity.getAuthToken({interactive:true}, console.log)

@@ -2,13 +2,14 @@
   "name": "CalXPort",
   "version": "0.1",
   "description": "Export class schedule from CalCentral's Enrollment Center to Google Calendar",
-  "permissions": ["activeTab", "declarativeContent", "tabs", "storage", "scripting"],
+  "permissions": ["activeTab", "declarativeContent", "tabs", "storage", "scripting", "identity"],
+  "host_permissions": ["https://www.googleapis.com/calendar/v3/calendars/*"],
   "options_page": "options.html",
   "background": {
     "service_worker": "background.js"
   },
   "oauth2": {
-    "client_id": "806985070719-8sillfgbsvbfn4a4nt7in4cjt2pqq4nq.apps.googleusercontent.com",
+    "client_id": "806985070719-tin1abr689k68d57c7ai0b0kfiasfbtk.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/calendar"]
   },
   "sandbox": {
