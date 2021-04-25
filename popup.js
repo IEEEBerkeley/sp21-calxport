@@ -154,9 +154,8 @@ exportButton.addEventListener("click", async () => {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
   }
-  jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", chrome.identity.getAuthToken({interactive:true}, (authToken) => {
-    return authToken;
-  }), {'start': {
+  chrome.identity.getAuthToken({interactive: true}, (token) => {
+    jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, {'start': {
       'dateTime': '2021-05-01T09:00:00-07:00',
       'timeZone': 'America/Los_Angeles'
     },
@@ -164,6 +163,8 @@ exportButton.addEventListener("click", async () => {
       'dateTime': '2021-05-01T17:00:00-07:00',
       'timeZone': 'America/Los_Angeles'
     }})
+  })
+  
 })
 //newAddEvent('math','2021-04-03T03:00:00-07:00','2021-04-03T05:00:00-07:00')
 // setTimeout(() => {
@@ -254,12 +255,7 @@ function jsonGET(url, authToken, body={}, query = '') {
 
 // get authToken
 chrome.identity.getAuthToken({interactive:true}, console.log)
-var aT = chrome.identity.getAuthToken({interactive: true}, (authTok) => {
-  console.log(authTok);
-  return authTok;
-});
-console.log(aT);
-aT
+
 // data: array of courses
 function exportData(data) {
   for (var i = 0; i < data.length; i += 1) {
