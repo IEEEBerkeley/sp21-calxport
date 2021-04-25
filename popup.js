@@ -1,38 +1,3 @@
-
-function newAddEvent(className, dateTimeStart, dateTimeEnd) {
-  var event = {
-    'summary': className,
-    'start': {
-      'dateTime': dateTimeStart,
-      'timeZone': 'America/Los_Angeles'
-    },
-    'end': {
-      'dateTime': dateTimeEnd,
-      'timeZone': 'America/Los_Angeles'
-    },
-    'recurrence': [
-      'RRULE:FREQ=WEEKLY;COUNT=15'
-    ],
-    'reminders': {
-      'useDefault': false,
-      'overrides': [
-        {'method': 'email', 'minutes': 24 * 60},
-        {'method': 'popup', 'minutes': 10}
-      ]
-    }
-  };
-
-  var request = gapi.client.calendar.events.insert({
-    'calendarId': 'primary',
-    'resource': event
-  });
-
-  request.execute(function(event) {
-    appendPre('Event created: ' + event.htmlLink);
-
-  });
-}
-
 /** Scraping Part */
 
 function scrapingScripts() {
@@ -128,6 +93,7 @@ function scrapingScripts() {
     }
     courseList.push(getCourseInfo(i));
   }
+  console.log(courseList);
   return courseList;
 }
 function addCourseToTable(courseDict, tableID) {
@@ -152,7 +118,8 @@ function addCourseToTable(courseDict, tableID) {
   table.appendChild(row);
   }
 };
-
+var course = [];
+// course will be nested arrays
 let getCourseButton = document.getElementById('getCourse');
 let exportButton = document.getElementById('export');
 let courseTable = document.getElementById('courseTable');
@@ -170,25 +137,35 @@ getCourseButton.addEventListener("click", async () => {
   },
   // gets return results from scrapingScripts()
   (injectionResults) => {
-    console.log(injectionResults[0].result);
+    //console.log(injectionResults[0].result);
     for (var i = 0; i < injectionResults[0].result.length; i += 1) {
       addCourseToTable(injectionResults[0].result[i], 'courseTable');
     }
+    console.log(course);
+    course.push(injectionResults[0].result);
+    console.log(course);
   })
   courseTable.style.display = 'block';
 }); 
-
+console.log(course);
 exportButton.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab.url.includes("bcsweb.is.berkeley.edu")) {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
   }
-  chrome.scripting.executeScript({
-    target: { tabID: tab.id },
-    function: newAddEvent('math','2021-04-03T03:00:00-07:00','2021-04-03T05:00:00-07:00'),
-  })
+  jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", chrome.identity.getAuthToken({interactive:true}, (authToken) => {
+    return authToken;
+  }), {'start': {
+      'dateTime': '2021-05-01T09:00:00-07:00',
+      'timeZone': 'America/Los_Angeles'
+    },
+    'end': {
+      'dateTime': '2021-05-01T17:00:00-07:00',
+      'timeZone': 'America/Los_Angeles'
+    }})
 })
+//newAddEvent('math','2021-04-03T03:00:00-07:00','2021-04-03T05:00:00-07:00')
 // setTimeout(() => {
 //   console.log(document.querySelector("iframe").contentWindow.postMessage("PING", "*"));
   
@@ -274,5 +251,54 @@ function jsonGET(url, authToken, body={}, query = '') {
     },
   }).then(res => res.json());
 }
+
 // get authToken
 chrome.identity.getAuthToken({interactive:true}, console.log)
+var aT = chrome.identity.getAuthToken({interactive: true}, (authTok) => {
+  console.log(authTok);
+  return authTok;
+});
+console.log(aT);
+aT
+// data: array of courses
+function exportData(data) {
+  for (var i = 0; i < data.length; i += 1) {
+    Object.keys(data[i]).forEach(function(k) {
+      var info = data[i][k];
+      console.log(info);
+    })
+  }
+} 
+function newAddEvent(className, dateTimeStart, dateTimeEnd) {
+  var event = {
+    'summary': className,
+    'start': {
+      'dateTime': dateTimeStart,
+      'timeZone': 'America/Los_Angeles'
+    },
+    'end': {
+      'dateTime': dateTimeEnd,
+      'timeZone': 'America/Los_Angeles'
+    },
+    'recurrence': [
+      'RRULE:FREQ=WEEKLY;COUNT=15'
+    ],
+    'reminders': {
+      'useDefault': false,
+      'overrides': [
+        {'method': 'email', 'minutes': 24 * 60},
+        {'method': 'popup', 'minutes': 10}
+      ]
+    }
+  };
+
+  var request = gapi.client.calendar.events.insert({
+    'calendarId': 'primary',
+    'resource': event
+  });
+
+  request.execute(function(event) {
+    appendPre('Event created: ' + event.htmlLink);
+
+  });
+}
