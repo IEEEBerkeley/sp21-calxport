@@ -11,6 +11,9 @@
     "client_id": "806985070719-8sillfgbsvbfn4a4nt7in4cjt2pqq4nq.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/calendar"]
   },
+  "sandbox": {
+    "pages": ["sandbox.html"]
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

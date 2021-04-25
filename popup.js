@@ -278,5 +278,38 @@ try {
 } catch (error) {
   console.log("Error: " + error);
 }
+// setTimeout(() => {
+//   console.log(document.querySelector("iframe").contentWindow.postMessage("PING", "*"));
+  
+// }, 5000)
 
+// window.addEventListener('message', e => {
+// 	console.log(e);
+//     e.source.postMessage('PING', e.origin === 'null' ? '*' : e.origin );
+// });
 
+let IFRAME = document.querySelector('iframe');
+
+// Front end
+function post(messageType, data) {
+  return new Promise(resolve => {
+    const handler = event => {
+      const { type, data } = event.data;
+      if (type === messageType) {
+        window.removeEventListener('message', handler);
+        resolve(data);
+      }
+    };
+    window.addEventListener('message', handler);
+  	IFRAME.contentWindow.postMessage({
+      type: messageType,
+      data: data
+    }, '*');
+  });
+}
+
+setTimeout(() => {
+  (async function(){
+    console.log(await post('ping', 12345));
+  })()
+  }, 5000)
