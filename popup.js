@@ -25,6 +25,12 @@ function scrapingScripts() {
     return [splitArray[0], splitArray[1]];
   }
 
+  function formatStartEndDates(arr) {
+    var startDate = arr[0].split("/").join("-");
+    var endDate = arr[1].split("/").join("-");
+    return [startDate, endDate]
+  }
+
   /** Returns an array of days and times of a class
    * Index 0: array of all the days of the class
    * Index 1: array of start time (index 0) and end time (index 1)
@@ -52,6 +58,26 @@ function scrapingScripts() {
     timeArray = [timeArray[0], timeArray[2]]
     return [dayArray, timeArray]
   }
+
+  function formatTime(timeString) {
+    if (timeString.includes("AM")) {
+  
+      var onlyTime = timeString.substring(0, timeString.indexOf("AM")) + ":00";
+      var splitArray = onlyTime.split(":");
+      if (splitArray[0] == "12") {
+        splitArray[0] = "00";
+      }
+      return splitArray.join(":");
+    } else {
+      var onlyTime = timeString.substring(0, timeString.indexOf("PM")) + ":00";
+      var splitArray = onlyTime.split(":");
+      if (splitArray[0] != "12") {
+        var hour = parseInt(splitArray[0]);
+        splitArray[0] = `${hour + 12}`;
+      }
+      return splitArray.join(":");
+    }
+  }
   
   function getRoom(node) {
     return getElementStringInRow(node, 3);
@@ -76,11 +102,11 @@ function scrapingScripts() {
       }
       sectionInfo["course"] = getCourseName(courseIdx);
       sectionInfo["section"] = section;
-      sectionInfo["startDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
-      sectionInfo["endDate"] = getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1].trim();
+      sectionInfo["startDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[0];
+      sectionInfo["endDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[1].trim();
       sectionInfo["days"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
-      sectionInfo["startTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][0];
-      sectionInfo["endTime"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][1];
+      sectionInfo["startTime"] = formatTime(getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][0]);
+      sectionInfo["endTime"] = formatTime(getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][1]);
       sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).trim();
       courseInfo[`${section}`] = sectionInfo
     }
@@ -164,9 +190,8 @@ exportButton.addEventListener("click", async () => {
       'timeZone': 'America/Los_Angeles'
     }})
   })
-  
+  //exportData(course[0]);
 })
-//newAddEvent('math','2021-04-03T03:00:00-07:00','2021-04-03T05:00:00-07:00')
 // setTimeout(() => {
 //   console.log(document.querySelector("iframe").contentWindow.postMessage("PING", "*"));
   
@@ -196,12 +221,6 @@ function post(messageType, data) {
     }, '*');
   });
 }
-
-// setTimeout(() => {
-//   (async function(){
-//     console.log(await post('ping', 12345));
-//   })()
-//   }, 5000)
 
 // NOTE: requires body properties to args.
 function jsonPOST(url, authToken, body={}, query = '') {
@@ -261,13 +280,24 @@ function exportData(data) {
   for (var i = 0; i < data.length; i += 1) {
     Object.keys(data[i]).forEach(function(k) {
       var info = data[i][k];
-      console.log(info);
+      var course = info["course"];
+      var days = info["days"];
+      var endDate = info["endDate"];
+      var endTime = info["endTime"];
+      var room = info["room"];
+      var section = info["section"];
+      var startDate = info["startDate"];
+      var startTime = info["startTime"];
+      //TODO: configure and use buildEvent to build JSON message to send event
+      // chrome.identity.getAuthToken({interactive: true}, (token) => {
+      //jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, {INSERT buildEvent HERE})
+      //})
     })
   }
 } 
-function newAddEvent(className, dateTimeStart, dateTimeEnd) {
+function buildEvent(course, days, dateTimeStart, room, sect, dateTimeEnd, timezone) {
   var event = {
-    'summary': className,
+    'summary': course,
     'start': {
       'dateTime': dateTimeStart,
       'timeZone': 'America/Los_Angeles'
@@ -287,14 +317,5 @@ function newAddEvent(className, dateTimeStart, dateTimeEnd) {
       ]
     }
   };
-
-  var request = gapi.client.calendar.events.insert({
-    'calendarId': 'primary',
-    'resource': event
-  });
-
-  request.execute(function(event) {
-    appendPre('Event created: ' + event.htmlLink);
-
-  });
 }
+
