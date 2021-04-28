@@ -378,7 +378,7 @@ function exportData(data) {
       // RRULE:FREQ=DAILY;UNTIL=19971224T000000Z
 
       var finalEndDateArray = endDate.split('-');
-      var finalEndString = finalEndDateArray[2] + startSchoolArray[0] + startSchoolArray[1] + "T000000Z";
+      var finalEndString = finalEndDateArray[2] + finalEndDateArray[0] + finalEndDateArray[1] + "T000000Z";
       console.log(finalEndString);
       
       const startSchool = startSchoolDate.getDay();
