@@ -180,17 +180,15 @@ exportButton.addEventListener("click", async () => {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
   }
+  var courseEvents = exportData(course[0]);
   chrome.identity.getAuthToken({interactive: true}, (token) => {
-    jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, {'start': {
-      'dateTime': '2021-05-01T09:00:00-07:00',
-      'timeZone': 'America/Los_Angeles'
-    },
-    'end': {
-      'dateTime': '2021-05-01T17:00:00-07:00',
-      'timeZone': 'America/Los_Angeles'
-    }})
+
+    for (var i = 0; i < courseEvents.length; i++) {
+      jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
+    }
+
   })
-  //exportData(course[0]);
+  
 })
 // setTimeout(() => {
 //   console.log(document.querySelector("iframe").contentWindow.postMessage("PING", "*"));
@@ -275,11 +273,18 @@ function jsonGET(url, authToken, body={}, query = '') {
 // get authToken
 chrome.identity.getAuthToken({interactive:true}, console.log)
 
+function addDaysToDate(date, days) {
+  var result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
 // data: array of courses
 function exportData(data) {
-  for (var i = 0; i < data.length; i += 1) {
-    Object.keys(data[i]).forEach(function(k) {
-      var info = data[i][k];
+  var events = [];
+  data.forEach(courseDict => {
+      console.log(courseDict);
+      var info = courseDict[Object.keys(courseDict)[0]];
+      console.log(info);
       var course = info["course"];
       var days = info["days"];
       var endDate = info["endDate"];
@@ -288,13 +293,98 @@ function exportData(data) {
       var section = info["section"];
       var startDate = info["startDate"];
       var startTime = info["startTime"];
+      //start here
+      var weekday = {};
+      weekday["Sunday"] = 0;
+      weekday["Monday"] = 1;
+      weekday["Tuesday"] = 2;
+      weekday["Wednesday"] = 3;
+      weekday["Thursday"] = 4;
+      weekday["Friday"] = 5;
+      weekday["Saturday"] = 6;
+
+      var months = {};
+      months["01"] = "January";
+      months["02"] = "February";
+      months["03"] = "March";
+      months["04"] = "April";
+      months["05"] = "May";
+      months["06"] = "June";
+      months["07"] = "July";
+      months["08"] = "August";
+      months["09"] = "September";
+      months["10"] = "October";
+      months["11"] = "November";
+      months["12"] = "December";
+
+
+      // Sunday - Saturday : 0 - 6
+      //const birthday = new Date('August 19, 1975 23:15:30');
+      //startDate: "01-19-2021"
+      //startTime: "14:00:00"
+      var startSchoolArray = startDate.split('-');
+      var startString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + startTime);
+      var endString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + endTime);
+      const startSchoolDate = new Date(startString);
+      const endSchoolDate = new Date(endString);
+      console.log(startSchoolDate);
+      console.log(endSchoolDate);
+      
+      const startSchool = startSchoolDate.getDay();
+
+      for (var i = 0; i < days.length; i++) {
+        var currDay = weekday[days[i]];
+        var addDays = 0; //difference between startDay and the start of classes
+        if (currDay - startSchool < 0) {
+          addDays = (currDay - startSchool) * (-1) + 7;
+        }
+        else {
+          addDays = currDay - startSchool;
+        }
+        //example of dateTime '2013-02-14T13:15:03-08:00' 
+        //https://developers.google.com/gmail/markup/reference/datetime-formatting#javascript
+        
+        var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
+        var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
+        events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, 'enter timezone heres'));
+      }
+
       //TODO: configure and use buildEvent to build JSON message to send event
       // chrome.identity.getAuthToken({interactive: true}, (token) => {
       //jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, {INSERT buildEvent HERE})
       //})
-    })
-  }
+  })
+  return events;
+
 } 
+
+
+//removed days from buildEvent
+function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, timezone) {
+  var event = {
+    'summary': course + " - " + sect,
+    'start': {
+      'dateTime': dateTimeStart,
+      'timeZone': 'America/Los_Angeles'
+    },
+    'end': {
+      'dateTime': dateTimeEnd,
+      'timeZone': 'America/Los_Angeles'
+    },
+    'recurrence': [
+      'RRULE:FREQ=WEEKLY;COUNT=15'
+    ],
+    'reminders': {
+      'useDefault': false,
+      'overrides': [
+        {'method': 'email', 'minutes': 24 * 60},
+        {'method': 'popup', 'minutes': 10}
+      ]
+    }
+  };
+  return event;
+}
+/*
 function buildEvent(course, days, dateTimeStart, room, sect, dateTimeEnd, timezone) {
   var event = {
     'summary': course,
@@ -317,5 +407,6 @@ function buildEvent(course, days, dateTimeStart, room, sect, dateTimeEnd, timezo
       ]
     }
   };
+  return event;
 }
-
+*/
