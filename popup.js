@@ -178,21 +178,23 @@ exportButton.addEventListener("click", async () => {
     return
   }
   var courseEvents = exportData(course[0]);
+  var eventLength = courseEvents.length;
+  var i = 0;
   chrome.identity.getAuthToken({interactive: true}, (token) => {
 
-    for (var i = 0; i < courseEvents.length; i++) {
-      var request = {
-        'calendarId': 'primary',
-        'resource': courseEvents[i]
+    // for (var i = 0; i < courseEvents.length; i++) {
+    //   jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
+    // }
+
+    var interval = setInterval(() => {
+      if (i == eventLength) {
+        console.log(courseEvents[i]);
+        clearInterval(interval);
+      } else {
+        jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
+        i += 1;
       }
-      //add json stuff here
-      sleep(20).then(() => { jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, request); });
-
-      //console.log(courseEvents[i]);
-      //setTimeout(() => { jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i]); }, 2);
-
-      
-    }
+    }, 4000, courseEvents, token, i)
 
   })
   
@@ -290,6 +292,39 @@ function addDaysToDate(date, days) {
   result.setDate(result.getDate() + days);
   return result;
 }
+
+function toBYDAY(dayList) {
+  var days = "";
+  for (var i = 0; i < dayList.length; i++) {
+    if (i != 0) {
+      days += ",";
+    }
+    switch (dayList[i]) {
+      case "Monday":
+				days += "MO";
+				break;
+			case "Tuesday":
+				days += "TU";
+				break;
+			case "Wednesday":
+				days += "WE";
+				break;
+			case "Thursday":
+				days += "TH";
+				break;
+			case "Friday":
+				days += "FR";
+				break;
+      case "Saturday":
+        days += "SA";
+        break;
+      case "Sunday":
+        days += "SU"
+        break;
+    }
+  }
+  return days;
+}
 // data: array of courses
 function exportData(data) {
   var events = [];
@@ -340,6 +375,11 @@ function exportData(data) {
       const startSchoolDate = new Date(startString);
       const endSchoolDate = new Date(endString);
 
+      // RRULE:FREQ=DAILY;UNTIL=19971224T000000Z
+
+      var finalEndDateArray = endDate.split('-');
+      var finalEndString = finalEndDateArray[2] + startSchoolArray[0] + startSchoolArray[1] + "T000000Z";
+      console.log(finalEndString);
       
       const startSchool = startSchoolDate.getDay();
 
@@ -357,7 +397,8 @@ function exportData(data) {
         
         var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
         var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
-        events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, 'enter timezone heres'));
+
+        events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
       }
 
       //TODO: configure and use buildEvent to build JSON message to send event
@@ -371,7 +412,7 @@ function exportData(data) {
 
 
 //removed days from buildEvent
-function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, timezone) {
+function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, dayRecurrStr, endSchoolDate) {
   var event = {
     'summary': course + " - " + sect,
     'start': {
@@ -383,7 +424,7 @@ function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, timezone) {
       'timeZone': 'America/Los_Angeles'
     },
     'recurrence': [
-      'RRULE:FREQ=WEEKLY;COUNT=15'
+      `RRULE:FREQ=WEEKLY;BYDAY=${dayRecurrStr};UNTIL=${endSchoolDate}`
     ],
     'reminders': {
       'useDefault': false,
