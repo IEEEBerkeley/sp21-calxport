@@ -167,13 +167,10 @@ getCourseButton.addEventListener("click", async () => {
     for (var i = 0; i < injectionResults[0].result.length; i += 1) {
       addCourseToTable(injectionResults[0].result[i], 'courseTable');
     }
-    console.log(course);
     course.push(injectionResults[0].result);
-    console.log(course);
   })
   courseTable.style.display = 'block';
 }); 
-console.log(course);
 exportButton.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab.url.includes("bcsweb.is.berkeley.edu")) {
@@ -181,16 +178,12 @@ exportButton.addEventListener("click", async () => {
     return
   }
   var courseEvents = exportData(course[0]);
-  var i = 0; // remember to reset this when clearInterval() is called
   var eventLength = courseEvents.length;
-  console.log(courseEvents);
+  var i = 0;
   chrome.identity.getAuthToken({interactive: true}, (token) => {
+
     // for (var i = 0; i < courseEvents.length; i++) {
-    //   console.log(i);
-    //   setTimeout((courseEvents, token) => {
-    //     console.log(courseEvents);
-    //     jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
-    //   }, 10)
+    //   jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
     // }
     var interval = setInterval(() => {
       if (i == eventLength) {
@@ -200,11 +193,15 @@ exportButton.addEventListener("click", async () => {
         jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
         i += 1;
       }
-    }, 10, courseEvents, token)
-
+    }, 4000, courseEvents, token, i)
   })
   
 })
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // setTimeout(() => {
 //   console.log(document.querySelector("iframe").contentWindow.postMessage("PING", "*"));
   
@@ -293,6 +290,39 @@ function addDaysToDate(date, days) {
   result.setDate(result.getDate() + days);
   return result;
 }
+
+function toBYDAY(dayList) {
+  var days = "";
+  for (var i = 0; i < dayList.length; i++) {
+    if (i != 0) {
+      days += ",";
+    }
+    switch (dayList[i]) {
+      case "Monday":
+				days += "MO";
+				break;
+			case "Tuesday":
+				days += "TU";
+				break;
+			case "Wednesday":
+				days += "WE";
+				break;
+			case "Thursday":
+				days += "TH";
+				break;
+			case "Friday":
+				days += "FR";
+				break;
+      case "Saturday":
+        days += "SA";
+        break;
+      case "Sunday":
+        days += "SU"
+        break;
+    }
+  }
+  return days;
+}
 // data: array of courses
 function exportData(data) {
   var events = [];
@@ -342,27 +372,30 @@ function exportData(data) {
       var endString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + endTime);
       const startSchoolDate = new Date(startString);
       const endSchoolDate = new Date(endString);
-      //console.log(startSchoolDate);
-      //console.log(endSchoolDate);
-      
+
+      // RRULE:FREQ=DAILY;UNTIL=19971224T000000Z
+
+      var finalEndDateArray = endDate.split('-');
+      var finalEndString = finalEndDateArray[2] + finalEndDateArray[0] + finalEndDateArray[1] + "T000000Z";
+      console.log(finalEndString);
       const startSchool = startSchoolDate.getDay();
 
-      for (var i = 0; i < days.length; i++) {
-        var currDay = weekday[days[i]];
-        var addDays = 0; //difference between startDay and the start of classes
-        if (currDay - startSchool < 0) {
-          addDays = (currDay - startSchool) * (-1) + 7;
-        }
-        else {
-          addDays = currDay - startSchool;
-        }
-        //example of dateTime '2013-02-14T13:15:03-08:00' 
-        //https://developers.google.com/gmail/markup/reference/datetime-formatting#javascript
-        
-        var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
-        var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
-        events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, 'enter timezone heres'));
+      var currDay = weekday[days[0]];
+      var addDays = 0; //difference between startDay and the start of classes
+      if (currDay - startSchool < 0) {
+        addDays = (currDay - startSchool) * (-1) + 7;
       }
+      else {
+        addDays = currDay - startSchool;
+      }
+      //example of dateTime '2013-02-14T13:15:03-08:00' 
+      //https://developers.google.com/gmail/markup/reference/datetime-formatting#javascript
+      
+      var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
+      var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
+
+      events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
+    
 
       //TODO: configure and use buildEvent to build JSON message to send event
       // chrome.identity.getAuthToken({interactive: true}, (token) => {
@@ -375,7 +408,7 @@ function exportData(data) {
 
 
 //removed days from buildEvent
-function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, timezone) {
+function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, dayRecurrStr, endSchoolDate) {
   var event = {
     'summary': course + " - " + sect,
     'start': {
@@ -387,7 +420,7 @@ function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, timezone) {
       'timeZone': 'America/Los_Angeles'
     },
     'recurrence': [
-      'RRULE:FREQ=WEEKLY;COUNT=15'
+      `RRULE:FREQ=WEEKLY;BYDAY=${dayRecurrStr};UNTIL=${endSchoolDate}`
     ],
     'reminders': {
       'useDefault': false,
