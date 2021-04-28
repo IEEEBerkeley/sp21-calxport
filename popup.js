@@ -181,11 +181,26 @@ exportButton.addEventListener("click", async () => {
     return
   }
   var courseEvents = exportData(course[0]);
+  var i = 0; // remember to reset this when clearInterval() is called
+  var eventLength = courseEvents.length;
+  console.log(courseEvents);
   chrome.identity.getAuthToken({interactive: true}, (token) => {
-
-    for (var i = 0; i < courseEvents.length; i++) {
-      jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
-    }
+    // for (var i = 0; i < courseEvents.length; i++) {
+    //   console.log(i);
+    //   setTimeout((courseEvents, token) => {
+    //     console.log(courseEvents);
+    //     jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
+    //   }, 10)
+    // }
+    var interval = setInterval(() => {
+      if (i == eventLength) {
+        console.log(courseEvents[i]);
+        clearInterval(interval);
+      } else {
+        jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
+        i += 1;
+      }
+    }, 10, courseEvents, token)
 
   })
   
@@ -282,7 +297,7 @@ function addDaysToDate(date, days) {
 function exportData(data) {
   var events = [];
   data.forEach(courseDict => {
-      console.log(courseDict);
+      //console.log(courseDict);
       var info = courseDict[Object.keys(courseDict)[0]];
       console.log(info);
       var course = info["course"];
@@ -327,8 +342,8 @@ function exportData(data) {
       var endString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + endTime);
       const startSchoolDate = new Date(startString);
       const endSchoolDate = new Date(endString);
-      console.log(startSchoolDate);
-      console.log(endSchoolDate);
+      //console.log(startSchoolDate);
+      //console.log(endSchoolDate);
       
       const startSchool = startSchoolDate.getDay();
 
@@ -384,29 +399,3 @@ function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, timezone) {
   };
   return event;
 }
-/*
-function buildEvent(course, days, dateTimeStart, room, sect, dateTimeEnd, timezone) {
-  var event = {
-    'summary': course,
-    'start': {
-      'dateTime': dateTimeStart,
-      'timeZone': 'America/Los_Angeles'
-    },
-    'end': {
-      'dateTime': dateTimeEnd,
-      'timeZone': 'America/Los_Angeles'
-    },
-    'recurrence': [
-      'RRULE:FREQ=WEEKLY;COUNT=15'
-    ],
-    'reminders': {
-      'useDefault': false,
-      'overrides': [
-        {'method': 'email', 'minutes': 24 * 60},
-        {'method': 'popup', 'minutes': 10}
-      ]
-    }
-  };
-  return event;
-}
-*/
