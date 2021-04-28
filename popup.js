@@ -383,23 +383,22 @@ function exportData(data) {
       
       const startSchool = startSchoolDate.getDay();
 
-      for (var i = 0; i < days.length; i++) {
-        var currDay = weekday[days[i]];
-        var addDays = 0; //difference between startDay and the start of classes
-        if (currDay - startSchool < 0) {
-          addDays = (currDay - startSchool) * (-1) + 7;
-        }
-        else {
-          addDays = currDay - startSchool;
-        }
-        //example of dateTime '2013-02-14T13:15:03-08:00' 
-        //https://developers.google.com/gmail/markup/reference/datetime-formatting#javascript
-        
-        var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
-        var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
-
-        events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
+      var currDay = weekday[days[0]];
+      var addDays = 0; //difference between startDay and the start of classes
+      if (currDay - startSchool < 0) {
+        addDays = (currDay - startSchool) * (-1) + 7;
       }
+      else {
+        addDays = currDay - startSchool;
+      }
+      //example of dateTime '2013-02-14T13:15:03-08:00' 
+      //https://developers.google.com/gmail/markup/reference/datetime-formatting#javascript
+      
+      var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
+      var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
+
+      events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
+    
 
       //TODO: configure and use buildEvent to build JSON message to send event
       // chrome.identity.getAuthToken({interactive: true}, (token) => {
