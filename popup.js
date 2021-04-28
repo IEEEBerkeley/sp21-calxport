@@ -34,19 +34,29 @@ function scrapingScripts() {
   /** Returns an array of days and times of a class
    * Index 0: array of all the days of the class
    * Index 1: array of start time (index 0) and end time (index 1)
+   * Returns either nested arrays, a single array of strings, or null
    */
   function getDaysTimes(node) {
+    // Can handle special cases
     var dtString = getElementStringInRow(node, 2);
+    //console.log(dtString);
     var dtArray = dtString.split("\n");
-    //console.log("dtArray 0: " + dtArray[0]);
-    //console.log("dtArray 1: " + dtArray[1]);
+    console.log(dtArray);
+    if (dtArray.length > 2) {
+      return dtArray;
+    }
+    return processDayTimeArray(dtArray);
+  }
+
+  function processDayTimeArray(arr) {
+    // Only handles normal cases + TBA cases
     //"Schedule: To Be Announced case"
-    if (dtArray.length == 1) {
+    if (arr.length == 1) {
       return null;
     }
 
-    var dayArray = dtArray[0].split(" ");
-    var timeArray = dtArray[1].split(" ");
+    var dayArray = arr[0].split(" ");
+    var timeArray = arr[1].split(" ");
     dayArray.shift();
     timeArray.shift();
     if (dayArray.join(" ") == "To be Announced") {
@@ -90,7 +100,7 @@ function scrapingScripts() {
   }
 
   /** Get course name and all related sections and their info */
-  function getCourseInfo(courseIdx) {
+  function getCourseInfo(courseIdx, specialCaseArray=[]) {
     var courseInfo = {};
     for (var row = 0; document.getElementById(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) != null; row += 1) {
       var sectionInfo = {};
@@ -100,6 +110,27 @@ function scrapingScripts() {
       if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) == null) {
         continue;
       }
+      if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length > 2) {
+        // ignore incorrect cases
+        continue;
+      }
+      // if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) != null 
+      //       && getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length > 2) {
+      //   // special case of day/time
+      //   var specialDTArr = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
+      //   for (var k = 0; k < specialDTArr.length; k++) {
+      //     sectionInfo["course"] = getCourseName(courseIdx);
+      //     sectionInfo["section"] = section;
+      //     sectionInfo["startDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[0];
+      //     sectionInfo["endDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[1].trim();
+      //     sectionInfo["days"] = getDaysTimes(specialDTArr.slice(k, k+2))[0];
+      //     sectionInfo["startTime"] = formatTime(getDaysTimes(specialDTArr.slice(k, k+2))[1][0]);
+      //     sectionInfo["endTime"] = formatTime(getDaysTimes(specialDTArr.slice(k, k+2))[1][1]);
+      //     sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).trim();
+      //     courseInfo[`${section}`] = sectionInfo
+      //   }
+      //   continue;
+      // }
       sectionInfo["course"] = getCourseName(courseIdx);
       sectionInfo["section"] = section;
       sectionInfo["startDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[0];
@@ -122,19 +153,11 @@ function scrapingScripts() {
   console.log(courseList);
   return courseList;
 }
+
 function addCourseToTable(courseDict, tableID) {
   let table = document.getElementById('courseTable');
   for (const [sect, inf] of Object.entries(courseDict)) {
     var row = document.createElement("tr");
-    // for (const [k, v] of Object.entries(courseDict[sect]))
-    // {
-    //   var info = document.createElement("td");
-    //   var node = document.createTextNode(v);
-    //   info.appendChild(node);
-    //   row.appendChild(info);
-    //   console.log(info)
-    // }
-    // console.log(inf)
     Object.keys(courseDict[sect]).forEach(function(k) {
       var info = document.createElement("td");
       var node = document.createTextNode(courseDict[sect][k]);
@@ -181,22 +204,32 @@ exportButton.addEventListener("click", async () => {
   var eventLength = courseEvents.length;
   var i = 0;
   chrome.identity.getAuthToken({interactive: true}, (token) => {
-
-    // for (var i = 0; i < courseEvents.length; i++) {
-    //   jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
-    // }
     var interval = setInterval(() => {
+      console.log(courseEvents[i]);
       if (i == eventLength) {
-        console.log(courseEvents[i]);
+        console.log(i);
         clearInterval(interval);
       } else {
-        jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
+        jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i]);
         i += 1;
       }
-    }, 4000, courseEvents, token, i)
+    }, 100, courseEvents, token, i)
   })
   
 })
+
+function checkValidEntry(entry) {
+  if (entry["days"].length < 1 || typeof entry["days"] != "string" ) {
+    return false;
+  }
+  if (entry["endDate"].length != 1 || entry["startDate"].length != 1) {
+    return false;
+  }
+  if (entry["room"].length != 1) {
+    return false;
+  }
+  return true;
+}
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -377,7 +410,7 @@ function exportData(data) {
 
       var finalEndDateArray = endDate.split('-');
       var finalEndString = finalEndDateArray[2] + finalEndDateArray[0] + finalEndDateArray[1] + "T000000Z";
-      console.log(finalEndString);
+      var testingFES = finalEndString.split("\n");
       const startSchool = startSchoolDate.getDay();
 
       var currDay = weekday[days[0]];
