@@ -167,13 +167,10 @@ getCourseButton.addEventListener("click", async () => {
     for (var i = 0; i < injectionResults[0].result.length; i += 1) {
       addCourseToTable(injectionResults[0].result[i], 'courseTable');
     }
-    console.log(course);
     course.push(injectionResults[0].result);
-    console.log(course);
   })
   courseTable.style.display = 'block';
 }); 
-console.log(course);
 exportButton.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab.url.includes("bcsweb.is.berkeley.edu")) {
@@ -184,12 +181,27 @@ exportButton.addEventListener("click", async () => {
   chrome.identity.getAuthToken({interactive: true}, (token) => {
 
     for (var i = 0; i < courseEvents.length; i++) {
-      jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i])
+      var request = {
+        'calendarId': 'primary',
+        'resource': courseEvents[i]
+      }
+      //add json stuff here
+      sleep(20).then(() => { jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, request); });
+
+      //console.log(courseEvents[i]);
+      //setTimeout(() => { jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i]); }, 2);
+
+      
     }
 
   })
   
 })
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // setTimeout(() => {
 //   console.log(document.querySelector("iframe").contentWindow.postMessage("PING", "*"));
   
@@ -327,8 +339,7 @@ function exportData(data) {
       var endString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + endTime);
       const startSchoolDate = new Date(startString);
       const endSchoolDate = new Date(endString);
-      console.log(startSchoolDate);
-      console.log(endSchoolDate);
+
       
       const startSchool = startSchoolDate.getDay();
 
