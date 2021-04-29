@@ -193,6 +193,9 @@ getCourseButton.addEventListener("click", async () => {
     course.push(injectionResults[0].result);
   })
   courseTable.style.display = 'block';
+  getCourseButton.disabled = true;
+  getCourseButton.style.background = "#aaa8a5";
+  getCourseButton.style.cursor = "default";
 }); 
 exportButton.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
