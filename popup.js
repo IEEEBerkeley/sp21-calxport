@@ -218,7 +218,7 @@ exportButton.addEventListener("click", async () => {
       }
     }, 100, courseEvents, token, i)
   })
-  
+  document.getElementById("exportmsg").style.display = 'block';
 })
 
 function checkValidEntry(entry) {

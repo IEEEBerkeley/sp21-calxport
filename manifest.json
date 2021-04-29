@@ -9,8 +9,7 @@
     "service_worker": "background.js"
   },
   "oauth2": {
-    //"client_id": "139632483351-hjfj1070revniee0selms86vu8qt8nbn.apps.googleusercontent.com",
-    "client_id": "806985070719-tin1abr689k68d57c7ai0b0kfiasfbtk.apps.googleusercontent.com",
+    "client_id": "806985070719-43u2mpmnec6qfgi4m1dqgq9o30juelfb.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/calendar"]
   },
   "sandbox": {
