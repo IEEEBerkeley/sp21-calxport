@@ -1,0 +1,60 @@
+button {
+    height: 40px;
+    width: 60px;
+    outline: none;
+    border-radius: 10px;
+}
+
+h1 {
+    height: 90px;
+    width: 300px;
+    color: #604927;
+    text-align: center;
+}
+
+.greyButton{
+    background-color: #615e5b;
+    border: none;
+    color: white;
+    padding: 2px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px auto;
+    cursor: pointer;
+    width: max-content;
+}
+
+.center-title {
+  text-align: center;
+  font-size: 16px;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  height: 200px;
+  overflow-y: scroll;
+}
+
+td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}

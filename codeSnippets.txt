@@ -1,6 +1,0 @@
-//prints all course names
-num = 0
-while (document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${num}`) != null) {
-    console.log(document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${num}`).childNodes[0].nodeValue);
-    num++;
-}
