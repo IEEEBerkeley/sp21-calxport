@@ -1,4 +1,13 @@
 /** Scraping Part */
+// import jQuery
+var script = document.createElement('script');
+script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
+script.type = 'text/javascript';
+document.getElementsByTagName('head')[0].appendChild(script);
+// To replace CSS selectors for jQuery
+function jq(myid) {
+  return "#" + myid.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
+}
 
 function scrapingScripts() {
   var courseList = [];
@@ -114,23 +123,6 @@ function scrapingScripts() {
         // ignore incorrect cases
         continue;
       }
-      // if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) != null 
-      //       && getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length > 2) {
-      //   // special case of day/time
-      //   var specialDTArr = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
-      //   for (var k = 0; k < specialDTArr.length; k++) {
-      //     sectionInfo["course"] = getCourseName(courseIdx);
-      //     sectionInfo["section"] = section;
-      //     sectionInfo["startDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[0];
-      //     sectionInfo["endDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[1].trim();
-      //     sectionInfo["days"] = getDaysTimes(specialDTArr.slice(k, k+2))[0];
-      //     sectionInfo["startTime"] = formatTime(getDaysTimes(specialDTArr.slice(k, k+2))[1][0]);
-      //     sectionInfo["endTime"] = formatTime(getDaysTimes(specialDTArr.slice(k, k+2))[1][1]);
-      //     sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).trim();
-      //     courseInfo[`${section}`] = sectionInfo
-      //   }
-      //   continue;
-      // }
       sectionInfo["course"] = getCourseName(courseIdx);
       sectionInfo["section"] = section;
       sectionInfo["startDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[0];
