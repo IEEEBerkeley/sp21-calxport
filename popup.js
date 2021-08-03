@@ -1,16 +1,7 @@
-/** Scraping Part */
-// import jQuery
-var script = document.createElement('script');
-script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
-script.type = 'text/javascript';
-document.getElementsByTagName('head')[0].appendChild(script);
-// To replace CSS selectors for jQuery
-function jq(myid) {
-  return "#" + myid.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
-}
+
 import {scrapedData} from './scrapingScripts.mjs';
 
-function addCourseToTable(courseDict, tableID) {
+function addCourseToTable(courseDict) {
   let table = document.getElementById('courseTable');
   for (const [sect, inf] of Object.entries(courseDict)) {
     var row = document.createElement("tr");
@@ -45,7 +36,7 @@ getCourseButton.addEventListener("click", async () => {
   (injectionResults) => {
     //console.log(injectionResults[0].result);
     for (var i = 0; i < injectionResults[0].result.length; i += 1) {
-      addCourseToTable(injectionResults[0].result[i], 'courseTable');
+      addCourseToTable(injectionResults[0].result[i]);
     }
     course.push(injectionResults[0].result);
   })
