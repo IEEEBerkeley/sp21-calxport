@@ -27,7 +27,6 @@ getCourseButton.addEventListener("click", async () => {
     return
   }
   exportButton.style.display = 'block';
-  
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
     function: scrapedData,
@@ -52,19 +51,21 @@ exportButton.addEventListener("click", async () => {
     return
   }
   var courseEvents = exportData(course[0]);
+  console.log(courseEvents);
   var eventLength = courseEvents.length;
   var i = 0;
   chrome.identity.getAuthToken({interactive: true}, (token) => {
+    console.log('eventLength: ', eventLength);
     var interval = setInterval(() => {
       console.log(courseEvents[i]);
-      if (i == eventLength) {
+      if (courseEvents[i] == null) {
         console.log(i);
         clearInterval(interval);
       } else {
         jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i]);
         i += 1;
       }
-    }, 100, courseEvents, token, i)
+    }, 500, courseEvents, token, i)
   })
   document.getElementById("exportmsg").style.display = 'block';
 })
