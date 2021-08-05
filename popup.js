@@ -33,7 +33,6 @@ getCourseButton.addEventListener("click", async () => {
   },
   // gets return results from scrapedData() in scrapingScripts.js
   (injectionResults) => {
-    //console.log(injectionResults[0].result);
     for (var i = 0; i < injectionResults[0].result.length; i += 1) {
       addCourseToTable(injectionResults[0].result[i]);
     }
@@ -50,11 +49,15 @@ exportButton.addEventListener("click", async () => {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
   }
+  console.log('course: ', course);
   var courseEvents = exportData(course[0]);
   console.log(courseEvents);
+  // var c1 = exportData(course[1]);
+  // console.log(c1);
   var eventLength = courseEvents.length;
   var i = 0;
   chrome.identity.getAuthToken({interactive: true}, (token) => {
+    // TODO: fix Rate Limit in setInterval (to maybe 1 second?)
     console.log('eventLength: ', eventLength);
     var interval = setInterval(() => {
       console.log(courseEvents[i]);
@@ -65,7 +68,7 @@ exportButton.addEventListener("click", async () => {
         jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i]);
         i += 1;
       }
-    }, 500, courseEvents, token, i)
+    }, 700, courseEvents, token, i)
   })
   document.getElementById("exportmsg").style.display = 'block';
 })
@@ -86,16 +89,6 @@ function checkValidEntry(entry) {
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-// setTimeout(() => {
-//   console.log(document.querySelector("iframe").contentWindow.postMessage("PING", "*"));
-  
-// }, 5000)
-
-// window.addEventListener('message', e => {
-// 	console.log(e);
-//     e.source.postMessage('PING', e.origin === 'null' ? '*' : e.origin );
-// });
 
 let IFRAME = document.querySelector('iframe');
 
@@ -212,83 +205,83 @@ function toBYDAY(dayList) {
 function exportData(data) {
   var events = [];
   data.forEach(courseDict => {
-      //console.log(courseDict);
-      var info = courseDict[Object.keys(courseDict)[0]];
-      console.log(info);
-      var course = info["course"];
-      var days = info["days"];
-      var endDate = info["endDate"];
-      var endTime = info["endTime"];
-      var room = info["room"];
-      var section = info["section"];
-      var startDate = info["startDate"];
-      var startTime = info["startTime"];
-      //start here
-      var weekday = {};
-      weekday["Sunday"] = 0;
-      weekday["Monday"] = 1;
-      weekday["Tuesday"] = 2;
-      weekday["Wednesday"] = 3;
-      weekday["Thursday"] = 4;
-      weekday["Friday"] = 5;
-      weekday["Saturday"] = 6;
+    //console.log(courseDict);
+    var info = courseDict[Object.keys(courseDict)[0]];
+    console.log(courseDict[Object.keys(courseDict)]);
+    console.log(info);
+    var course = info["course"];
+    var days = info["days"];
+    var endDate = info["endDate"];
+    var endTime = info["endTime"];
+    var room = info["room"];
+    var section = info["section"];
+    var startDate = info["startDate"];
+    var startTime = info["startTime"];
+    //start here
+    var weekday = {};
+    weekday["Sunday"] = 0;
+    weekday["Monday"] = 1;
+    weekday["Tuesday"] = 2;
+    weekday["Wednesday"] = 3;
+    weekday["Thursday"] = 4;
+    weekday["Friday"] = 5;
+    weekday["Saturday"] = 6;
 
-      var months = {};
-      months["01"] = "January";
-      months["02"] = "February";
-      months["03"] = "March";
-      months["04"] = "April";
-      months["05"] = "May";
-      months["06"] = "June";
-      months["07"] = "July";
-      months["08"] = "August";
-      months["09"] = "September";
-      months["10"] = "October";
-      months["11"] = "November";
-      months["12"] = "December";
+    var months = {};
+    months["01"] = "January";
+    months["02"] = "February";
+    months["03"] = "March";
+    months["04"] = "April";
+    months["05"] = "May";
+    months["06"] = "June";
+    months["07"] = "July";
+    months["08"] = "August";
+    months["09"] = "September";
+    months["10"] = "October";
+    months["11"] = "November";
+    months["12"] = "December";
 
 
-      // Sunday - Saturday : 0 - 6
-      //const birthday = new Date('August 19, 1975 23:15:30');
-      //startDate: "01-19-2021"
-      //startTime: "14:00:00"
-      var startSchoolArray = startDate.split('-');
-      var startString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + startTime);
-      var endString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + endTime);
-      const startSchoolDate = new Date(startString);
-      const endSchoolDate = new Date(endString);
+    // Sunday - Saturday : 0 - 6
+    //const birthday = new Date('August 19, 1975 23:15:30');
+    //startDate: "01-19-2021"
+    //startTime: "14:00:00"
+    var startSchoolArray = startDate.split('-');
+    var startString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + startTime);
+    var endString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + endTime);
+    const startSchoolDate = new Date(startString);
+    const endSchoolDate = new Date(endString);
 
-      // RRULE:FREQ=DAILY;UNTIL=19971224T000000Z
+    // RRULE:FREQ=DAILY;UNTIL=19971224T000000Z
 
-      var finalEndDateArray = endDate.split('-');
-      var finalEndString = finalEndDateArray[2] + finalEndDateArray[0] + finalEndDateArray[1] + "T000000Z";
-      var testingFES = finalEndString.split("\n");
-      const startSchool = startSchoolDate.getDay();
+    var finalEndDateArray = endDate.split('-');
+    var finalEndString = finalEndDateArray[2] + finalEndDateArray[0] + finalEndDateArray[1] + "T000000Z";
+    var testingFES = finalEndString.split("\n");
+    const startSchool = startSchoolDate.getDay();
 
-      var currDay = weekday[days[0]];
-      var addDays = 0; //difference between startDay and the start of classes
-      if (currDay - startSchool < 0) {
-        addDays = (currDay - startSchool) * (-1) + 7;
-      }
-      else {
-        addDays = currDay - startSchool;
-      }
-      //example of dateTime '2013-02-14T13:15:03-08:00' 
-      //https://developers.google.com/gmail/markup/reference/datetime-formatting#javascript
+    var currDay = weekday[days[0]];
+    var addDays = 0; //difference between startDay and the start of classes
+    if (currDay - startSchool < 0) {
+      addDays = (currDay - startSchool) * (-1) + 7;
+    }
+    else {
+      addDays = currDay - startSchool;
+    }
+    //example of dateTime '2013-02-14T13:15:03-08:00' 
+    //https://developers.google.com/gmail/markup/reference/datetime-formatting#javascript
       
-      var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
-      var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
+    var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
+    var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
 
-      events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
+    events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
     
 
-      //TODO: configure and use buildEvent to build JSON message to send event
-      // chrome.identity.getAuthToken({interactive: true}, (token) => {
-      //jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, {INSERT buildEvent HERE})
-      //})
+    //TODO: configure and use buildEvent to build JSON message to send event
+    // chrome.identity.getAuthToken({interactive: true}, (token) => {
+    //jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, {INSERT buildEvent HERE})
+    //})
   })
   return events;
-
 } 
 
 
