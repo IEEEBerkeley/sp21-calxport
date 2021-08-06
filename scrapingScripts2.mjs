@@ -152,7 +152,9 @@ export function scrapedData2() {
       if (document.getElementById(`DERIVED_SSR_FL_SSR_DRV_STAT$392$$${i}`).innerText == "Dropped") {
         continue;
       }
-      courseList.push(getCourseInfo(i));
+      for (var row = 0; getSectionInfo(i, row) != null; row += 1) {
+          courseList.push(getSectionInfo(i, row));
+      }
     }
     console.log(courseList);
     return courseList;
