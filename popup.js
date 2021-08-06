@@ -285,6 +285,44 @@ function exportData(data) {
   return events;
 }
 
+function exportData2(data) {
+  // data arg is a list of Section objects
+  var events = [];
+  data.forEach(s => {
+    var course = s.course;
+    var days = s.days;
+    var endDate = s.endDate;
+    var endTime = s.endTime;
+    var room = s.room;
+    var section = s.section;
+    var startDate = s.startDate;
+    var startTime = s.startTime;
+
+    var startSchoolArray = startDate.split('-');
+    var startString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + startTime);
+    var endString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + endTime);
+    const startSchoolDate = new Date(startString);
+    const endSchoolDate = new Date(endString);
+
+    var finalEndDateArray = endDate.split('-');
+    var finalEndString = finalEndDateArray[2] + finalEndDateArray[0] + finalEndDateArray[1] + "T000000Z";
+    const startSchool = startSchoolDate.getDay();
+
+    var currDay = weekdays[days[0]];
+    var addDays = 0; //difference between startDay and the start of classes
+    if (currDay - startSchool < 0) {
+      addDays = (currDay - startSchool) * (-1) + 7;
+    } else {
+      addDays = currDay - startSchool;
+    }
+
+    var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
+    var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
+
+    events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
+  })
+  return events;
+}
 
 //removed days from buildEvent
 function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, dayRecurrStr, endSchoolDate) {
