@@ -1,7 +1,7 @@
 export class Section {
     constructor(course, sectionName, startDate, endDate, days, startTime, endTime, room) {
         this.course = course;
-        this.sectionName = sectionName;
+        this.section = sectionName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.days = days;
@@ -13,7 +13,7 @@ export class Section {
         return this.course;
     }
     get section() {
-        return this.sectionName;
+        return this.section;
     }
     get startDate() {
         return this.startDate;
