@@ -1,4 +1,5 @@
-export function scrapedData() {
+import { Section } from "./sectionStructure.mjs";
+export function scrapedData2() {
     var courseList = [];
     /** NOTE: need to replace these codes with function calls for the simplicity of codes (currently unable to do so) */
     function getCourseName(courseIdx) {
@@ -39,7 +40,7 @@ export function scrapedData() {
       var dtString = getElementStringInRow(node, 2);
       //console.log(dtString);
       var dtArray = dtString.split("\n");
-      //console.log(dtArray);
+      console.log(dtArray);
       if (dtArray.length > 2) {
         return dtArray;
       }
@@ -109,7 +110,7 @@ export function scrapedData() {
           continue;
         }
         if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length > 2) {
-          // ignore incorrect cases
+          // ignore incorrect cases (WARNING: WHAT ARE INCORRECT CASES?)
           continue;
         }
         sectionInfo["course"] = getCourseName(courseIdx);
@@ -123,6 +124,28 @@ export function scrapedData() {
         courseInfo[`${section}`] = sectionInfo
       }
       return courseInfo;
+    }
+
+    function getSectionInfo(courseIdx, row) {
+        // NOTE: Section is an object!
+        //ADD WARNING TO USER FOR IT
+        if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) == null) {
+            return null;
+          }
+          if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length > 2) {
+            // ignore incorrect cases (WARNING: WHAT ARE INCORRECT CASES?)
+            return null;
+          }
+        section = new Section();
+        section.course = getCourseName(courseIdx);
+        section.sectionName = getSectionName(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
+        section.startDate = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[0];;
+        section.endDate = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[1].trim();;
+        section.days = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];;
+        section.startTime = formatTime(getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][0]);;
+        section.endTime = formatTime(getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][1]);;
+        section.room = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).trim();
+        return section;
     }
     for (var i = 0; document.getElementById(`DERIVED_SSR_FL_SSR_SCRTAB_DTLS$${i}`) != null; i += 1) {
       /** Ignores dropped classes */
