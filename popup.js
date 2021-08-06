@@ -1,19 +1,28 @@
+import {
+  scrapedData
+} from './scrapingScripts.mjs';
 
-import {scrapedData} from './scrapingScripts.mjs';
-
+import {weekdays, months} from './dates.mjs';
 function addCourseToTable(courseDict) {
   let table = document.getElementById('courseTable');
   for (const [sect, inf] of Object.entries(courseDict)) {
     var row = document.createElement("tr");
-    Object.keys(courseDict[sect]).forEach(function(k) {
+    Object.keys(courseDict[sect]).forEach(function (k) {
       var info = document.createElement("td");
       var node = document.createTextNode(courseDict[sect][k]);
       info.appendChild(node);
       row.appendChild(info);
     })
-  table.appendChild(row);
+    table.appendChild(row);
   }
 };
+// IN PROGRESS!
+function addSectionToTable(sectionList) {
+  var table = document.getElementById('courseTable');
+  sectionList.forEach(o => {
+    return;
+  })
+}
 
 var course = [];
 // course will be nested arrays
@@ -21,30 +30,38 @@ let getCourseButton = document.getElementById('getCourse');
 let exportButton = document.getElementById('export');
 let courseTable = document.getElementById('courseTable');
 getCourseButton.addEventListener("click", async () => {
-  let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  let [tab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  });
   if (!tab.url.includes("bcsweb.is.berkeley.edu")) {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
   }
   exportButton.style.display = 'block';
   chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    function: scrapedData,
-  },
-  // gets return results from scrapedData() in scrapingScripts.js
-  (injectionResults) => {
-    for (var i = 0; i < injectionResults[0].result.length; i += 1) {
-      addCourseToTable(injectionResults[0].result[i]);
-    }
-    course.push(injectionResults[0].result);
-  })
+      target: {
+        tabId: tab.id
+      },
+      function: scrapedData,
+    },
+    // gets return results from scrapedData() in scrapingScripts.js
+    (injectionResults) => {
+      for (var i = 0; i < injectionResults[0].result.length; i += 1) {
+        addCourseToTable(injectionResults[0].result[i]);
+      }
+      course.push(injectionResults[0].result);
+    })
   courseTable.style.display = 'block';
   getCourseButton.disabled = true;
   getCourseButton.style.background = "#aaa8a5";
   getCourseButton.style.cursor = "default";
-}); 
+});
 exportButton.addEventListener("click", async () => {
-  let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  let [tab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  });
   if (!tab.url.includes("bcsweb.is.berkeley.edu")) {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
@@ -56,7 +73,9 @@ exportButton.addEventListener("click", async () => {
   // console.log(c1);
   var eventLength = courseEvents.length;
   var i = 0;
-  chrome.identity.getAuthToken({interactive: true}, (token) => {
+  chrome.identity.getAuthToken({
+    interactive: true
+  }, (token) => {
     // TODO: fix Rate Limit in setInterval (to maybe 1 second?)
     console.log('eventLength: ', eventLength);
     var interval = setInterval(() => {
@@ -74,7 +93,7 @@ exportButton.addEventListener("click", async () => {
 })
 
 function checkValidEntry(entry) {
-  if (entry["days"].length < 1 || typeof entry["days"] != "string" ) {
+  if (entry["days"].length < 1 || typeof entry["days"] != "string") {
     return false;
   }
   if (entry["endDate"].length != 1 || entry["startDate"].length != 1) {
@@ -96,14 +115,17 @@ let IFRAME = document.querySelector('iframe');
 function post(messageType, data) {
   return new Promise(resolve => {
     const handler = event => {
-      const { type, data } = event.data;
+      const {
+        type,
+        data
+      } = event.data;
       if (type === messageType) {
         window.removeEventListener('message', handler);
         resolve(data);
       }
     };
     window.addEventListener('message', handler);
-  	IFRAME.contentWindow.postMessage({
+    IFRAME.contentWindow.postMessage({
       type: messageType,
       data: data
     }, '*');
@@ -111,7 +133,7 @@ function post(messageType, data) {
 }
 
 // NOTE: requires body properties to args.
-function jsonPOST(url, authToken, body={}, query = '') {
+function jsonPOST(url, authToken, body = {}, query = '') {
   // VERY CRITICAL
   // url = URL
   // authToken = token
@@ -125,18 +147,19 @@ function jsonPOST(url, authToken, body={}, query = '') {
   converts into data=1234
   */
   if (query) {
-  	query = '?' + Object.entries(query).map(([key, value]) => key + '=' + value).join('&');
+    query = '?' + Object.entries(query).map(([key, value]) => key + '=' + value).join('&');
   }
-	return fetch(url + query, {
-  	method: 'POST',
+  return fetch(url + query, {
+    method: 'POST',
     headers: {
-    	'Content-Type': 'application/json',
+      'Content-Type': 'application/json',
       'Authorization': `Bearer ${authToken}`
     },
     body: JSON.stringify(body)
   }).then(res => res.json());
 }
-function jsonGET(url, authToken, body={}, query = '') {
+
+function jsonGET(url, authToken, body = {}, query = '') {
   // VERY CRITICAL
   // url = URL
   // authToken = token
@@ -150,10 +173,10 @@ function jsonGET(url, authToken, body={}, query = '') {
   converts into data=1234
   */
   if (query) {
-  	query = '?' + Object.entries(query).map(([key, value]) => key + '=' + value).join('&');
+    query = '?' + Object.entries(query).map(([key, value]) => key + '=' + value).join('&');
   }
-	return fetch(url + query, {
-  	method: 'GET',
+  return fetch(url + query, {
+    method: 'GET',
     headers: {
       'Authorization': `Bearer ${authToken}`
     },
@@ -161,7 +184,9 @@ function jsonGET(url, authToken, body={}, query = '') {
 }
 
 // get authToken
-chrome.identity.getAuthToken({interactive:true}, console.log)
+chrome.identity.getAuthToken({
+  interactive: true
+}, console.log)
 
 function addDaysToDate(date, days) {
   var result = new Date(date);
@@ -177,20 +202,20 @@ function toBYDAY(dayList) {
     }
     switch (dayList[i]) {
       case "Monday":
-				days += "MO";
-				break;
-			case "Tuesday":
-				days += "TU";
-				break;
-			case "Wednesday":
-				days += "WE";
-				break;
-			case "Thursday":
-				days += "TH";
-				break;
-			case "Friday":
-				days += "FR";
-				break;
+        days += "MO";
+        break;
+      case "Tuesday":
+        days += "TU";
+        break;
+      case "Wednesday":
+        days += "WE";
+        break;
+      case "Thursday":
+        days += "TH";
+        break;
+      case "Friday":
+        days += "FR";
+        break;
       case "Saturday":
         days += "SA";
         break;
@@ -218,29 +243,6 @@ function exportData(data) {
     var startDate = info["startDate"];
     var startTime = info["startTime"];
     //start here
-    var weekday = {};
-    weekday["Sunday"] = 0;
-    weekday["Monday"] = 1;
-    weekday["Tuesday"] = 2;
-    weekday["Wednesday"] = 3;
-    weekday["Thursday"] = 4;
-    weekday["Friday"] = 5;
-    weekday["Saturday"] = 6;
-
-    var months = {};
-    months["01"] = "January";
-    months["02"] = "February";
-    months["03"] = "March";
-    months["04"] = "April";
-    months["05"] = "May";
-    months["06"] = "June";
-    months["07"] = "July";
-    months["08"] = "August";
-    months["09"] = "September";
-    months["10"] = "October";
-    months["11"] = "November";
-    months["12"] = "December";
-
 
     // Sunday - Saturday : 0 - 6
     //const birthday = new Date('August 19, 1975 23:15:30');
@@ -259,22 +261,21 @@ function exportData(data) {
     var testingFES = finalEndString.split("\n");
     const startSchool = startSchoolDate.getDay();
 
-    var currDay = weekday[days[0]];
+    var currDay = weekdays[days[0]];
     var addDays = 0; //difference between startDay and the start of classes
     if (currDay - startSchool < 0) {
       addDays = (currDay - startSchool) * (-1) + 7;
-    }
-    else {
+    } else {
       addDays = currDay - startSchool;
     }
     //example of dateTime '2013-02-14T13:15:03-08:00' 
     //https://developers.google.com/gmail/markup/reference/datetime-formatting#javascript
-      
+
     var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
     var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
 
     events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
-    
+
 
     //TODO: configure and use buildEvent to build JSON message to send event
     // chrome.identity.getAuthToken({interactive: true}, (token) => {
@@ -282,7 +283,7 @@ function exportData(data) {
     //})
   })
   return events;
-} 
+}
 
 
 //removed days from buildEvent
@@ -302,9 +303,14 @@ function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, dayRecurrStr
     ],
     'reminders': {
       'useDefault': false,
-      'overrides': [
-        {'method': 'email', 'minutes': 24 * 60},
-        {'method': 'popup', 'minutes': 10}
+      'overrides': [{
+          'method': 'email',
+          'minutes': 24 * 60
+        },
+        {
+          'method': 'popup',
+          'minutes': 10
+        }
       ]
     }
   };
