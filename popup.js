@@ -18,8 +18,8 @@ function addCourseToTable(courseDict) {
 // TODO: fix the formatting error (s is a single object aka section)
 function addSectionToTable(s) {
   var table = document.getElementById('courseTable');
-  console.log(s);
-  console.log(Object.values(s)[0]);
+  // console.log(s);
+  // console.log(Object.values(s)[0]);
   var properties = Object.values(s);
   var row = document.createElement('tr');
   for (var i = 0; i < properties.length; i += 1) {
@@ -27,7 +27,6 @@ function addSectionToTable(s) {
     var val = document.createTextNode(properties[i]);
     cell.appendChild(val);
     row.appendChild(cell);
-    console.log(properties[i]);
   }
   table.appendChild(row);
 }
@@ -63,6 +62,7 @@ getCourseButton.addEventListener("click", async () => {
       }
       course.push(injectionResults[0].result);
     })
+  console.log(course);
   courseTable.style.display = 'block';
   getCourseButton.disabled = true;
   getCourseButton.style.background = "#aaa8a5";
@@ -237,6 +237,7 @@ function toBYDAY(dayList) {
   }
   return days;
 }
+
 // data: array of courses
 function exportData(data) {
   var events = [];
