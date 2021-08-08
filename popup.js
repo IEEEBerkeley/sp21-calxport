@@ -3,7 +3,6 @@ import { scrapedData } from './scrapingScripts.js';
 import {weekdays, months} from './dates.mjs';
 function addSectionToTable(s) {
   var table = document.getElementById('courseTable');
-  //var properties = Object.values(s);
   var properties = [s.course, s.sectionName, s.startDate, s.endDate, s.days, s.startTime, s.endTime, s.room]
   var row = document.createElement('tr');
   for (var i = 0; i < properties.length; i += 1) {
@@ -15,8 +14,7 @@ function addSectionToTable(s) {
   table.appendChild(row);
 }
 
-var course = [];
-// course will be nested arrays
+var course = []; // course will be nested arrays
 let getCourseButton = document.getElementById('getCourse');
 let exportButton = document.getElementById('export');
 let courseTable = document.getElementById('courseTable');
@@ -44,7 +42,6 @@ getCourseButton.addEventListener("click", async () => {
         // this for loop executes after everything outside is done executing
         let s = injectionResults[0].result[i];
         addSectionToTable(s);
-        course.push(s);
       }
     })
   courseTable.style.display = 'block';
@@ -61,7 +58,7 @@ exportButton.addEventListener("click", async () => {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
   }
-  var sectionEvents = exportData2(course);
+  var sectionEvents = exportData(course);
   var eventLength = sectionEvents.length;
   var i = 0;
   chrome.identity.getAuthToken({
@@ -213,7 +210,7 @@ function dateConverter(dateString) {
   }
   return months[dateArr[0]] + " " + dateArr[1] + " " + dateArr[2]
 }
-function exportData2(data) {
+function exportData(data) {
   // data arg is a list of Section objects
   var events = [];
   for (var i = 0; i < data.length; i += 1) {

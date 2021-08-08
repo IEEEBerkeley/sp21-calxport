@@ -124,7 +124,6 @@ export function scrapedData() {
     section = new Section();
     section.course = getCourseName(courseIdx);
     section.sectionName = getSectionName(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
-    //console.log(section);
     section.startDate = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[0];
     section.endDate = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[1].trim();
     section.days = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
