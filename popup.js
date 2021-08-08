@@ -1,26 +1,12 @@
 import { scrapedData } from './scrapingScripts.js';
 
 import {weekdays, months} from './dates.mjs';
-function addCourseToTable(courseDict) {
-  let table = document.getElementById('courseTable');
-  for (const [sect, inf] of Object.entries(courseDict)) {
-    var row = document.createElement("tr");
-    Object.keys(courseDict[sect]).forEach(function (k) {
-      var info = document.createElement("td");
-      var node = document.createTextNode(courseDict[sect][k]);
-      info.appendChild(node);
-      row.appendChild(info);
-    })
-    table.appendChild(row);
-  }
-};
 // IN PROGRESS!
 // TODO: fix the formatting error (s is a single object aka section)
 function addSectionToTable(s) {
   var table = document.getElementById('courseTable');
-  // console.log(s);
-  // console.log(Object.values(s)[0]);
-  var properties = Object.values(s);
+  //var properties = Object.values(s);
+  var properties = [s.course, s.sectionName, s.startDate, s.endDate, s.days, s.startTime, s.endTime, s.room]
   var row = document.createElement('tr');
   for (var i = 0; i < properties.length; i += 1) {
     var cell = document.createElement('td');
