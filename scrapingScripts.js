@@ -139,6 +139,9 @@ export function scrapedData() {
       continue;
     }
     for (var row = 0; document.getElementById(`STDNT_ENRL_SSVW$${i}_row_${row}`) != null; row += 1) {
+      if (getSectionInfo(i, row) == null) {
+        continue;
+      }
       cL2.push(getSectionInfo(i, row));
     }
   }
