@@ -56,12 +56,12 @@ getCourseButton.addEventListener("click", async () => {
     (injectionResults) => {
       // injectionResults[0].result[n] shows [object Object]
       // for all n-long array of cL2
-      console.log('Injection Results:' + injectionResults[0].result[0]);
       for (var i = 0; i < injectionResults[0].result.length; i += 1) {
         addSectionToTable(injectionResults[0].result[i]);
       }
       course.push(injectionResults[0].result);
     })
+  console.log('course ds:', course);
   console.log(course);
   courseTable.style.display = 'block';
   getCourseButton.disabled = true;
@@ -77,11 +77,7 @@ exportButton.addEventListener("click", async () => {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
   }
-  console.log('course: ', course);
   var courseEvents = exportData(course[0]);
-  console.log(courseEvents);
-  // var c1 = exportData(course[1]);
-  // console.log(c1);
   var eventLength = courseEvents.length;
   var i = 0;
   chrome.identity.getAuthToken({
