@@ -10,9 +10,6 @@ export function scrapedData() {
         this.endTime = endTime;
         this.room = room;
     }
-    get propertiesList() {
-      return [this.course, this.sectionName, this.startDate, this.endDate, this.days, this.startTime, this.endTime, this.room]
-    }
 }
   var cL2 = [];
   var courseList = [];

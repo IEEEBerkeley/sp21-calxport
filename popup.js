@@ -103,23 +103,6 @@ exportButton.addEventListener("click", async () => {
   document.getElementById("exportmsg").style.display = 'block';
 })
 
-function checkValidEntry(entry) {
-  if (entry["days"].length < 1 || typeof entry["days"] != "string") {
-    return false;
-  }
-  if (entry["endDate"].length != 1 || entry["startDate"].length != 1) {
-    return false;
-  }
-  if (entry["room"].length != 1) {
-    return false;
-  }
-  return true;
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 let IFRAME = document.querySelector('iframe');
 
 // Front end
@@ -236,65 +219,6 @@ function toBYDAY(dayList) {
     }
   }
   return days;
-}
-
-// data: array of courses
-function exportData(data) {
-  var events = [];
-  data.forEach(courseDict => {
-    //console.log(courseDict);
-    var info = courseDict[Object.keys(courseDict)[0]];
-    console.log(courseDict[Object.keys(courseDict)]);
-    console.log(info);
-    var course = info["course"];
-    var days = info["days"];
-    var endDate = info["endDate"];
-    var endTime = info["endTime"];
-    var room = info["room"];
-    var section = info["section"];
-    var startDate = info["startDate"];
-    var startTime = info["startTime"];
-    //start here
-
-    // Sunday - Saturday : 0 - 6
-    //const birthday = new Date('August 19, 1975 23:15:30');
-    //startDate: "01-19-2021"
-    //startTime: "14:00:00"
-    var startSchoolArray = startDate.split('-');
-    var startString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + startTime);
-    var endString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + endTime);
-    const startSchoolDate = new Date(startString);
-    const endSchoolDate = new Date(endString);
-
-    // RRULE:FREQ=DAILY;UNTIL=19971224T000000Z
-
-    var finalEndDateArray = endDate.split('-');
-    var finalEndString = finalEndDateArray[2] + finalEndDateArray[0] + finalEndDateArray[1] + "T000000Z";
-    var testingFES = finalEndString.split("\n");
-    const startSchool = startSchoolDate.getDay();
-
-    var currDay = weekdays[days[0]];
-    var addDays = 0; //difference between startDay and the start of classes
-    if (currDay - startSchool < 0) {
-      addDays = (currDay - startSchool) * (-1) + 7;
-    } else {
-      addDays = currDay - startSchool;
-    }
-    //example of dateTime '2013-02-14T13:15:03-08:00' 
-    //https://developers.google.com/gmail/markup/reference/datetime-formatting#javascript
-
-    var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
-    var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
-
-    events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
-
-
-    //TODO: configure and use buildEvent to build JSON message to send event
-    // chrome.identity.getAuthToken({interactive: true}, (token) => {
-    //jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, {INSERT buildEvent HERE})
-    //})
-  })
-  return events;
 }
 /** Convert a string of Enrollment Center's date to Google Calendar-readable date
  * Following this format: 'August 19, 1975'
