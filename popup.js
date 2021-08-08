@@ -1,8 +1,6 @@
 import { scrapedData } from './scrapingScripts.js';
 
 import {weekdays, months} from './dates.mjs';
-// IN PROGRESS!
-// TODO: fix the formatting error (s is a single object aka section)
 function addSectionToTable(s) {
   var table = document.getElementById('courseTable');
   //var properties = Object.values(s);
@@ -47,11 +45,8 @@ getCourseButton.addEventListener("click", async () => {
         let s = injectionResults[0].result[i];
         addSectionToTable(s);
         course.push(s);
-        //console.log(s);
-        console.log('Course length: ', course.length)
       }
     })
-  console.log('course ds:', course);
   courseTable.style.display = 'block';
   getCourseButton.disabled = true;
   getCourseButton.style.background = "#aaa8a5";
@@ -66,7 +61,6 @@ exportButton.addEventListener("click", async () => {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
   }
-  //var courseEvents = exportData(course[0]);
   var sectionEvents = exportData2(course);
   var eventLength = sectionEvents.length;
   var i = 0;
@@ -76,9 +70,7 @@ exportButton.addEventListener("click", async () => {
     // TODO: fix Rate Limit in setInterval (to maybe 1 second?)
     console.log('eventLength: ', eventLength);
     var interval = setInterval(() => {
-      //console.log(courseEvents[i]);
       if (sectionEvents[i] == null) {
-        console.log(sectionEvents[i]);
         clearInterval(interval);
       } else {
         jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, sectionEvents[i]);
