@@ -1,13 +1,14 @@
-import {
-  scrapedData
-} from './scrapingScripts.mjs';
+import { scrapedData } from './scrapingScripts.js';
+import { scrapedData2 } from './scrapingScripts2.mjs';
 
 import {weekdays, months} from './dates.mjs';
 function addCourseToTable(courseDict) {
   let table = document.getElementById('courseTable');
   for (const [sect, inf] of Object.entries(courseDict)) {
+    //console.log([sect, inf]);
     var row = document.createElement("tr");
     Object.keys(courseDict[sect]).forEach(function (k) {
+      //console.log(k);
       var info = document.createElement("td");
       var node = document.createTextNode(courseDict[sect][k]);
       info.appendChild(node);
@@ -17,11 +18,22 @@ function addCourseToTable(courseDict) {
   }
 };
 // IN PROGRESS!
+// TODO: fix the formatting error (sectionList is a single object)
 function addSectionToTable(sectionList) {
   var table = document.getElementById('courseTable');
-  sectionList.forEach(o => {
-    return;
-  })
+  console.log(sectionList);
+  for (var o in sectionList) {
+    var row = document.createElement('tr');
+    var propList = o.propertiesList;
+    console.log(o);
+    for (var e in propList) {
+      var cell = document.createElement('td');
+      var val = document.createTextNode(e);
+      cell.appendChild(val);
+      row.appendChild(cell);
+    }
+    table.appendChild(row);
+  }
 }
 
 var course = [];
@@ -47,8 +59,9 @@ getCourseButton.addEventListener("click", async () => {
     },
     // gets return results from scrapedData() in scrapingScripts.js
     (injectionResults) => {
+      console.log(injectionResults);
       for (var i = 0; i < injectionResults[0].result.length; i += 1) {
-        addCourseToTable(injectionResults[0].result[i]);
+        addSectionToTable(injectionResults[0].result[i]);
       }
       course.push(injectionResults[0].result);
     })

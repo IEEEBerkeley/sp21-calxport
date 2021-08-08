@@ -9,28 +9,4 @@ export class Section {
         this.endTime = endTime;
         this.room = room;
     }
-    get course() {
-        return this.course;
-    }
-    get sectionName() {
-        return this.sectionName;
-    }
-    get startDate() {
-        return this.startDate;
-    }
-    get endDate() {
-        return this.endDate;
-    }
-    get days() {
-        return this.days;
-    }
-    get startTime() {
-        return this.startTime;
-    }
-    get endTime() {
-        return this.endTime;
-    }
-    get room() {
-        return this.room;
-    }
 }

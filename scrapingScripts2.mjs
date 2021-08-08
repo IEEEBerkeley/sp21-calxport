@@ -1,5 +1,16 @@
-import { Section } from "./sectionStructure.mjs";
 export function scrapedData2() {
+    class Section {
+        constructor(course, sectionName, startDate, endDate, days, startTime, endTime, room) {
+            this.course = course;
+            this.sectionName = sectionName;
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.days = days;
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.room = room;
+        }
+    }
     var courseList = [];
     /** NOTE: need to replace these codes with function calls for the simplicity of codes (currently unable to do so) */
     function getCourseName(courseIdx) {
