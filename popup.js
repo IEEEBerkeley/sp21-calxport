@@ -1,14 +1,11 @@
 import { scrapedData } from './scrapingScripts.js';
-import { scrapedData2 } from './scrapingScripts2.mjs';
 
 import {weekdays, months} from './dates.mjs';
 function addCourseToTable(courseDict) {
   let table = document.getElementById('courseTable');
   for (const [sect, inf] of Object.entries(courseDict)) {
-    //console.log([sect, inf]);
     var row = document.createElement("tr");
     Object.keys(courseDict[sect]).forEach(function (k) {
-      //console.log(k);
       var info = document.createElement("td");
       var node = document.createTextNode(courseDict[sect][k]);
       info.appendChild(node);
@@ -18,22 +15,21 @@ function addCourseToTable(courseDict) {
   }
 };
 // IN PROGRESS!
-// TODO: fix the formatting error (sectionList is a single object)
-function addSectionToTable(sectionList) {
+// TODO: fix the formatting error (s is a single object aka section)
+function addSectionToTable(s) {
   var table = document.getElementById('courseTable');
-  console.log(sectionList);
-  for (var o in sectionList) {
-    var row = document.createElement('tr');
-    var propList = o.propertiesList;
-    console.log(o);
-    for (var e in propList) {
-      var cell = document.createElement('td');
-      var val = document.createTextNode(e);
-      cell.appendChild(val);
-      row.appendChild(cell);
-    }
-    table.appendChild(row);
+  console.log(s);
+  console.log(Object.values(s)[0]);
+  var properties = Object.values(s);
+  var row = document.createElement('tr');
+  for (var i = 0; i < properties.length; i += 1) {
+    var cell = document.createElement('td');
+    var val = document.createTextNode(properties[i]);
+    cell.appendChild(val);
+    row.appendChild(cell);
+    console.log(properties[i]);
   }
+  table.appendChild(row);
 }
 
 var course = [];
@@ -59,7 +55,9 @@ getCourseButton.addEventListener("click", async () => {
     },
     // gets return results from scrapedData() in scrapingScripts.js
     (injectionResults) => {
-      console.log(injectionResults);
+      // injectionResults[0].result[n] shows [object Object]
+      // for all n-long array of cL2
+      console.log('Injection Results:' + injectionResults[0].result[0]);
       for (var i = 0; i < injectionResults[0].result.length; i += 1) {
         addSectionToTable(injectionResults[0].result[i]);
       }
