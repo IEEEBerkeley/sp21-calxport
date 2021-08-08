@@ -113,34 +113,7 @@ export function scrapedData() {
     return element;
   }
 
-  /** Get course name and all related sections and their info */
-  function getCourseInfo(courseIdx, specialCaseArray = []) {
-    var courseInfo = {};
-    for (var row = 0; document.getElementById(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) != null; row += 1) {
-      var sectionInfo = {};
-      var section = getSectionName(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`);
-
-      //ADD WARNING TO USER FOR IT
-      if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`) == null) {
-        continue;
-      }
-      if (getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).length > 2) {
-        // ignore incorrect cases
-        continue;
-      }
-      sectionInfo["course"] = getCourseName(courseIdx);
-      sectionInfo["section"] = section;
-      sectionInfo["startDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[0];
-      sectionInfo["endDate"] = formatStartEndDates(getStartEndDates(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`))[1].trim();
-      sectionInfo["days"] = getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[0];
-      sectionInfo["startTime"] = formatTime(getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][0]);
-      sectionInfo["endTime"] = formatTime(getDaysTimes(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`)[1][1]);
-      sectionInfo["room"] = getRoom(`STDNT_ENRL_SSVW$${courseIdx}_row_${row}`).trim();
-      courseInfo[`${section}`] = sectionInfo
-    }
-    return courseInfo;
-  }
-
+  /** Get info of section */
   function getSectionInfo(courseIdx, row) {
     // NOTE: Section is an object!
     //ADD WARNING TO USER FOR IT
@@ -171,9 +144,6 @@ export function scrapedData() {
     for (var row = 0; document.getElementById(`STDNT_ENRL_SSVW$${i}_row_${row}`) != null; row += 1) {
       cL2.push(getSectionInfo(i, row));
     }
-    courseList.push(getCourseInfo(i));
   }
-  console.log(courseList);
-  console.log(cL2);
   return cL2;
 }

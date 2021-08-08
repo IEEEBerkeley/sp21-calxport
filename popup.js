@@ -314,16 +314,13 @@ function dateConverter(dateString) {
 function exportData2(data) {
   // data arg is a list of Section objects
   var events = [];
-  console.log(data);
   for (var i = 0; i < data.length; i += 1) {
-    console.log(data[i]);
     let course = data[i]['course'];
-    let section = data[i]['section'];
     let days = data[i]['days'];
     let endDate = data[i]['endDate'];
     let endTime = data[i]['endTime'];
     let room = data[i]['room'];
-    let section = data[i]['section'];
+    let sectionName = data[i]['sectionName'];
     let startDate = data[i]['startDate'];
     let startTime = data[i]['startTime'];
 
@@ -343,12 +340,10 @@ function exportData2(data) {
     } else {
       addDays = currDay - startSchoolDay;
     }
-    console.log(addDays);
-
     var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
     var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
 
-    events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
+    events.push(buildEvent(course, dateTimeStart, room, sectionName, dateTimeEnd, toBYDAY(days), finalEndString));
   }
   return events;
 }
