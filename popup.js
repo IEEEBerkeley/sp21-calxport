@@ -57,12 +57,15 @@ getCourseButton.addEventListener("click", async () => {
       // injectionResults[0].result[n] shows [object Object]
       // for all n-long array of cL2
       for (var i = 0; i < injectionResults[0].result.length; i += 1) {
-        addSectionToTable(injectionResults[0].result[i]);
+        // this for loop executes after everything outside is done executing
+        let s = injectionResults[0].result[i];
+        addSectionToTable(s);
+        course.push(s);
+        //console.log(s);
+        console.log('Course length: ', course.length)
       }
-      course.push(injectionResults[0].result);
     })
   console.log('course ds:', course);
-  console.log(course);
   courseTable.style.display = 'block';
   getCourseButton.disabled = true;
   getCourseButton.style.background = "#aaa8a5";
@@ -77,8 +80,9 @@ exportButton.addEventListener("click", async () => {
     alert("Invalid site. Please go to CalCentral's Enrollment Center.");
     return
   }
-  var courseEvents = exportData(course[0]);
-  var eventLength = courseEvents.length;
+  //var courseEvents = exportData(course[0]);
+  var sectionEvents = exportData2(course);
+  var eventLength = sectionEvents.length;
   var i = 0;
   chrome.identity.getAuthToken({
     interactive: true
@@ -86,15 +90,15 @@ exportButton.addEventListener("click", async () => {
     // TODO: fix Rate Limit in setInterval (to maybe 1 second?)
     console.log('eventLength: ', eventLength);
     var interval = setInterval(() => {
-      console.log(courseEvents[i]);
-      if (courseEvents[i] == null) {
-        console.log(i);
+      //console.log(courseEvents[i]);
+      if (sectionEvents[i] == null) {
+        console.log(sectionEvents[i]);
         clearInterval(interval);
       } else {
-        jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, courseEvents[i]);
+        jsonPOST("https://www.googleapis.com/calendar/v3/calendars/primary/events", token, sectionEvents[i]);
         i += 1;
       }
-    }, 700, courseEvents, token, i)
+    }, 700, sectionEvents, token, i)
   })
   document.getElementById("exportmsg").style.display = 'block';
 })
@@ -292,43 +296,60 @@ function exportData(data) {
   })
   return events;
 }
-
+/** Convert a string of Enrollment Center's date to Google Calendar-readable date
+ * Following this format: 'August 19, 1975'
+ * Sunday - Saturday : 0 - 6
+   const birthday = new Date('August 19, 1975 23:15:30');
+   startDate: "01-19-2021"
+   startTime: "14:00:00"
+ */
+function dateConverter(dateString) {
+  var dateArr = dateString.split('-');
+  if (dateArr.length < 3) {
+    console.log("THE DATE FORMAT OF ENROLLMENT CENTER IS INVALID");
+    console.log("Got: " + dateString);
+  }
+  return months[dateArr[0]] + " " + dateArr[1] + " " + dateArr[2]
+}
 function exportData2(data) {
   // data arg is a list of Section objects
   var events = [];
-  data.forEach(s => {
-    var course = s.course;
-    var days = s.days;
-    var endDate = s.endDate;
-    var endTime = s.endTime;
-    var room = s.room;
-    var section = s.section;
-    var startDate = s.startDate;
-    var startTime = s.startTime;
+  console.log(data);
+  for (var i = 0; i < data.length; i += 1) {
+    console.log(data[i]);
+    let course = data[i]['course'];
+    let section = data[i]['section'];
+    let days = data[i]['days'];
+    let endDate = data[i]['endDate'];
+    let endTime = data[i]['endTime'];
+    let room = data[i]['room'];
+    let section = data[i]['section'];
+    let startDate = data[i]['startDate'];
+    let startTime = data[i]['startTime'];
 
-    var startSchoolArray = startDate.split('-');
-    var startString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + startTime);
-    var endString = (months[startSchoolArray[0]] + " " + startSchoolArray[1] + ", " + startSchoolArray[2] + " " + endTime);
+    var startString = dateConverter(startDate) + " " + startTime;
+    var endString = dateConverter(startDate) + " " + endTime;
     const startSchoolDate = new Date(startString);
     const endSchoolDate = new Date(endString);
 
     var finalEndDateArray = endDate.split('-');
     var finalEndString = finalEndDateArray[2] + finalEndDateArray[0] + finalEndDateArray[1] + "T000000Z";
-    const startSchool = startSchoolDate.getDay();
+    const startSchoolDay = startSchoolDate.getDay();
 
     var currDay = weekdays[days[0]];
     var addDays = 0; //difference between startDay and the start of classes
-    if (currDay - startSchool < 0) {
-      addDays = (currDay - startSchool) * (-1) + 7;
+    if (currDay - startSchoolDay < 0) {
+      addDays = (currDay - startSchoolDay) * (-1) + 7;
     } else {
-      addDays = currDay - startSchool;
+      addDays = currDay - startSchoolDay;
     }
+    console.log(addDays);
 
     var dateTimeStart = addDaysToDate(startSchoolDate, addDays).toISOString();
     var dateTimeEnd = addDaysToDate(endSchoolDate, addDays).toISOString();
 
     events.push(buildEvent(course, dateTimeStart, room, section, dateTimeEnd, toBYDAY(days), finalEndString));
-  })
+  }
   return events;
 }
 
@@ -360,5 +381,8 @@ function buildEvent(course, dateTimeStart, room, sect, dateTimeEnd, dayRecurrStr
       ]
     }
   };
+  if (room != 'To be Announced') {
+    event['location'] = room;
+  }
   return event;
 }
