@@ -18,6 +18,7 @@ var course = []; // course will be nested arrays
 let getCourseButton = document.getElementById('getCourse');
 let exportButton = document.getElementById('export');
 let courseTable = document.getElementById('courseTable');
+
 getCourseButton.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({
     active: true,
@@ -42,13 +43,16 @@ getCourseButton.addEventListener("click", async () => {
         // this for loop executes after everything outside is done executing
         let s = injectionResults[0].result[i];
         addSectionToTable(s);
+        course.push(s);
       }
     })
   courseTable.style.display = 'block';
   getCourseButton.disabled = true;
   getCourseButton.style.background = "#aaa8a5";
   getCourseButton.style.cursor = "default";
+  console.log(course);
 });
+
 exportButton.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({
     active: true,

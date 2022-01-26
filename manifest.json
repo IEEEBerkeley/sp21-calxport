@@ -9,7 +9,7 @@
     "service_worker": "background.js"
   },
   "oauth2": {
-    "client_id": "[REDACTED]",
+    "client_id": "806985070719-gtim95u4jsvl1k0ehnvukhg9r1o6i8q6.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/calendar"]
   },
   "sandbox": {
